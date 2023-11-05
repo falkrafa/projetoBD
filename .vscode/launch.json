@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-BdprojectApplication<bdproject>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "bdproject.bdproject.BdprojectApplication",
+            "projectName": "bdproject",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
