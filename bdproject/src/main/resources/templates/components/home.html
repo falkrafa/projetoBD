@@ -5,16 +5,27 @@
     <title>Lista de produtos</title>
 </head>
 <body>
+    <div th:if="${user.isLoggedIn}">
+        <a th:href="@{/logout}">Logout</a>
+        <div th:if="${resultNomeLogin != null}">
+            <p>Ola: <span th:text="${resultNomeLogin[0]['nome']}"></span></p>
+        </div>
+    </div>
+    <div th:unless="${user.isLoggedIn}">
+        <p>Não logado</p>
+        <a th:href="@{/login}">Login</a>
+    </div>
+    
     <h1>Lista de produtos</h1>
     <table>
-    <tr>
-        <th>Produtos</th>
-    </tr>
-    <tr th:each="resultado : ${resultados}">
-        <td>
-            <a th:href="@{'/produto/' + ${resultado['id_produto']}}"><span th:text="${resultado['nome']}"></span></a>
-        </td>
-    </tr>
-</table>
+        <tr>
+            <th>Produtos</th>
+        </tr>
+        <tr th:each="resultado : ${resultados}">
+            <td>
+                <a th:href="@{'/produto/' + ${resultado['id_produto']}}"><span th:text="${resultado['nome']}"></span></a>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
