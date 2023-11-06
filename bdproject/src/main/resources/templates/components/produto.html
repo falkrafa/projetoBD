@@ -17,8 +17,30 @@
             <td th:text="${row['nomeProduto']}"></td>
             <td th:text="'$ ' + ${row['PrecoProduto']}"></td>
             <td th:text="${row['DescricaoProduto']}"></td>
-            <td th:text="${row['NomeProduto']}"></td>
+            <td th:text="${row['NomeCategoria']}"></td>
+            <td>
+                <button th:attr="data-product-id=${row['idProduto']}" class="add-to-cart-button">Adicionar ao Carrinho</button>
+            </td>       
         </tr>
     </table>
+    <script type="text/javascript">
+        document.querySelectorAll('.add-to-cart-button').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var productId = this.getAttribute('data-product-id');
+                             
+                fetch('/carrinho/adicionar/' + productId, { method: 'POST' })
+                    .then(function (response) {
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        var message = data.message;
+                        if (message) {
+                            alert(message);
+                        }
+                });
+                console.log(productId);
+            });
+        });
+    </script>
 </body>
 </html>

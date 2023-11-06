@@ -13,5 +13,37 @@
         <input type="password" id="senha" name="senha" required><br>
         <input type="submit" value="Login" id="loginButton">
     </form>
+    <p id="loginError"></p>
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Impede o envio padrão do formulário
+    
+            var email = document.getElementById("email").value;
+            var senha = document.getElementById("senha").value;
+    
+            // Use o método fetch para enviar os dados para o controlador
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'email=' + email + '&senha=' + senha,
+            })
+            .then(response => response.json()) // Dependendo da resposta do controlador, pode ser necessário ajustar o tipo de dados
+            .then(data => {
+                // Trate a resposta do controlador, se necessário
+                if (data.loggedIn) {
+                    // Redirecione para a página de destino após o login bem-sucedido
+                    window.location.href = '/';
+                } else {
+                    document.getElementById("loginError").textContent = "Credenciais inválidas";
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+            });
+        });
+    </script>
+    
 </body>
 </html>

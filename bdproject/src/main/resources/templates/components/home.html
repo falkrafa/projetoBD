@@ -27,5 +27,51 @@
             </td>
         </tr>
     </table>
+    <div class="cart-sidebar">
+        <h2>Carrinho de Compras</h2>
+        <ul id="cart-items">
+            <!-- Itens do carrinho serão atualizados aqui -->
+        </ul>
+        <button id="limpar-carrinho">Limpar Carrinho</button>
+    </div>
+    
+    
+    <script type="text/javascript">
+        // Função para atualizar a barra lateral do carrinho em tempo real
+        function atualizarCarrinho() {
+            fetch('/carrinho') // Endpoint para obter itens do carrinho
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    var cartItems = data.itens;
+                    var cartItemsList = document.getElementById('cart-items');
+
+                    cartItemsList.innerHTML = '';
+                    cartItems.forEach(function (item) {
+                        var listItem = document.createElement('li');
+                        listItem.textContent = "Nome: " + item.nome + " - Preço: $" + item.preco;
+                        cartItemsList.appendChild(listItem);
+                    });
+                    atualizarCarrinho();
+                });
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            var limparCarrinhoButton = document.getElementById('limpar-carrinho');
+        
+            limparCarrinhoButton.addEventListener('click', function () {
+                fetch('/carrinho/limpar', { method: 'POST' })
+                    .then(function (response) {
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        var message = data.message;
+                        alert(message);
+                        atualizarCarrinho();
+                    });
+            });
+        });
+        atualizarCarrinho();
+    </script>
 </body>
 </html>

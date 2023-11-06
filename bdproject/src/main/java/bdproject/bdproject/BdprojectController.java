@@ -10,12 +10,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
-
+import org.springframework.web.bind.annotation.ResponseBody;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Controller
-@SessionAttributes(value = {"user", "resultNomeLogin"})
+@SessionAttributes(value = {"user", "resultNomeLogin", "CartItem","carrinho"})
 public class BdprojectController {
 
     @Autowired
@@ -24,6 +25,10 @@ public class BdprojectController {
     @ModelAttribute("user")
     public CustomUser getUser() {
         return new CustomUser();
+    }
+    @ModelAttribute("carrinho")
+    public Carrinho getCarrinho() {
+        return new Carrinho();
     }
 
     @GetMapping("/")
@@ -36,7 +41,7 @@ public class BdprojectController {
 
     @GetMapping("/produto/{id}")
     public String showProduct(@PathVariable Long id, Model model) {
-        String sql = "select p.nome as nomeProduto, p.preco as PrecoProduto, p.descricao as DescricaoProduto, c.nome as NomeCategoria\r\n" + //
+        String sql = "select p.id_produto as idProduto, p.nome as nomeProduto, p.preco as PrecoProduto, p.descricao as DescricaoProduto, c.nome as NomeCategoria\r\n" + //
                 "from produto p \r\n" + //
                 "join categoria c on p.fk_id_categoria = c.id_categoria\r\n" + //
                 "where p.id_produto = ?";
@@ -46,22 +51,29 @@ public class BdprojectController {
     }
 
     @GetMapping("/login")
-    public String showLoginPage() {
+    public String showLoginPage(@ModelAttribute("user") CustomUser user) {
+        if (user.isLoggedIn()) {
+            return "redirect:/";
+        }
         return "components/login";
-    }
+}
 
     @PostMapping("/login")
-    public String login(@RequestParam("email") String email, @RequestParam("senha") String senha, @ModelAttribute("user") CustomUser user, Model model) {
+    @ResponseBody
+    public Map<String, Object> login(@RequestParam("email") String email, @RequestParam("senha") String senha, @ModelAttribute("user") CustomUser user, Model model) {
+        Map<String, Object> response = new HashMap<>();
+        
         String sql = "select p.nome from pessoa p where p.email = ? and p.senha = ?";
         List<Map<String, Object>> resultNomeLogin = jdbcTemplate.queryForList(sql, email, senha);
         model.addAttribute("resultNomeLogin", resultNomeLogin);
         
         if (resultNomeLogin != null && !resultNomeLogin.isEmpty()) {
             user.setLoggedIn(true);
-            return "redirect:/";
+            response.put("loggedIn", true);
         } else {
-            return "redirect:/login";
+            response.put("loggedIn", false);
         }
+        return response;
     }
 
     @GetMapping("/logout")
@@ -69,4 +81,35 @@ public class BdprojectController {
         user.setLoggedIn(false);
         return "redirect:/";
     }
+
+    @GetMapping("/carrinho")
+    @ResponseBody
+    public Map<String, Object> getCarrinho(@ModelAttribute("carrinho") Carrinho carrinho) {
+        Map<String, Object> response = new HashMap<>();
+        List<Map<String, Object>> itensCarrinho = carrinho.getItens();
+        response.put("itens", itensCarrinho);
+        return response;
+    }
+
+    @PostMapping("/carrinho/limpar")
+    @ResponseBody
+    public Map<String, Object> limparCarrinho(@ModelAttribute("carrinho") Carrinho carrinho) {
+        Map<String, Object> response = new HashMap<>();
+        carrinho.limparCarrinho();
+        response.put("message", "Carrinho foi limpo com sucesso.");
+        return response;
+    }
+
+    @PostMapping("/carrinho/adicionar/{id}")
+    @ResponseBody
+    public Map<String, Object> adicionarAoCarrinho(@PathVariable Long id, @ModelAttribute("carrinho") Carrinho carrinho, Model model) {
+        Map<String, Object> response = new HashMap<>();
+
+        carrinho.adicionarItem(jdbcTemplate, id);
+
+        response.put("message", "Produto adicionado ao carrinho com sucesso.");
+        return response;
+    }
+
+
 }
