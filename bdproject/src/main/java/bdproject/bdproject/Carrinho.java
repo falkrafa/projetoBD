@@ -12,15 +12,27 @@ public class Carrinho {
     public void adicionarItem(JdbcTemplate jdbcTemplate, Long produtoId) {
         String sql = "SELECT * FROM produto WHERE id_produto = ?";
         List<Map<String, Object>> produto = jdbcTemplate.queryForList(sql, produtoId);
-        
-        // System.out.println(produtoId);
-        // if (!produto.isEmpty()) {
-        //     Map<String, Object> produtoMap = produto.get(0);
-        //     // if(produtoMap.containsKey("id_produto") ) {
-        //     // }
-        // }
-        // itens.add(produto.get(0));
+
+        if (!produto.isEmpty()) {
+            Map<String, Object> produtoMap = produto.get(0);
+            // Verifica se o carrinho já tem o produto
+            boolean produtoExiste = false;
+            for (Map<String, Object> item : itens) {
+                if (item.get("id_produto").equals(produtoMap.get("id_produto"))) {
+                    int quantidade = (int) item.getOrDefault("quantidade", 0);
+                    item.put("quantidade", quantidade + 1);
+                    produtoExiste = true;
+                    break;
+                }
+            }
+            // Se não existe, adiciona o produto ao carrinho
+            if (!produtoExiste) {
+                produtoMap.put("quantidade", 1); // Define a quantidade inicial como 1
+                itens.add(produtoMap);
+            }
+        }
     }
+
 
     public void limparCarrinho() {
         itens.clear();

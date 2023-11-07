@@ -39,23 +39,24 @@
     <script type="text/javascript">
         // Função para atualizar a barra lateral do carrinho em tempo real
         function atualizarCarrinho() {
-            fetch('/carrinho') // Endpoint para obter itens do carrinho
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (data) {
-                    var cartItems = data.itens;
-                    var cartItemsList = document.getElementById('cart-items');
+    fetch('/carrinho') // Endpoint para obter itens do carrinho
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            var cartItems = data.itens;
+            var cartItemsList = document.getElementById('cart-items');
 
-                    cartItemsList.innerHTML = '';
-                    cartItems.forEach(function (item) {
-                        var listItem = document.createElement('li');
-                        listItem.textContent = "Nome: " + item.nome + " - Preço: $" + item.preco;
-                        cartItemsList.appendChild(listItem);
-                    });
-                    atualizarCarrinho();
-                });
-        }
+            cartItemsList.innerHTML = '';
+            cartItems.forEach(function (item) {
+                var listItem = document.createElement('li');
+                listItem.textContent = "Nome: " + item.nome + " - Preço: $" + item.preco + " - Quantidade: " + item.quantidade;
+                cartItemsList.appendChild(listItem);
+        
+            });
+            atualizarCarrinho();
+        });
+}
         document.addEventListener('DOMContentLoaded', function () {
             var limparCarrinhoButton = document.getElementById('limpar-carrinho');
         
