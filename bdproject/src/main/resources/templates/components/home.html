@@ -30,49 +30,95 @@
     <div class="cart-sidebar">
         <h2>Carrinho de Compras</h2>
         <ul id="cart-items">
-            <!-- Itens do carrinho serão atualizados aqui -->
+            <!-- Cart items will be updated here -->
         </ul>
         <button id="limpar-carrinho">Limpar Carrinho</button>
     </div>
     
-    
     <script type="text/javascript">
-        // Função para atualizar a barra lateral do carrinho em tempo real
-        function atualizarCarrinho() {
-    fetch('/carrinho') // Endpoint para obter itens do carrinho
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (data) {
-            var cartItems = data.itens;
-            var cartItemsList = document.getElementById('cart-items');
-
-            cartItemsList.innerHTML = '';
-            cartItems.forEach(function (item) {
+        // Function to update the cart
+        function atualizarCarrinho(updatedCart) {
+            const cartItemsList = document.getElementById('cart-items-list');
+            cartItemsList.innerHTML = ''; // Clear the cart items list
+        
+            updatedCart.forEach(function (item) {
                 var listItem = document.createElement('li');
+                listItem.setAttribute('id', 'cart-item-' + item.id_produto);
                 listItem.textContent = "Nome: " + item.nome + " - Preço: $" + item.preco + " - Quantidade: " + item.quantidade;
+                var deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.onclick = function() { deleteCartItem(item.id_produto); };
+                listItem.appendChild(deleteButton);
+        
                 cartItemsList.appendChild(listItem);
-        
             });
-            atualizarCarrinho();
-        });
-}
-        document.addEventListener('DOMContentLoaded', function () {
-            var limparCarrinhoButton = document.getElementById('limpar-carrinho');
+        }
         
+
+        // Function to add a product to the cart
+        function adicionarAoCarrinho(productId) {
+            fetch('/carrinho/adicionar/' + productId, {
+                method: 'POST',
+                headers: {
+                    // Add CSRF header if needed; depends on your Spring Security configuration
+                    // 'X-CSRF-TOKEN': token
+                }
+            }).then(response => {
+                return response.json(); // Assuming your endpoint returns a JSON response
+            }).then(data => {
+                alert(data.message); // Alert the message from the server
+                window.location.href = '/'; // Redirect to the home page
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Function to delete an item from the cart
+        function deleteCartItem(productId) {
+            fetch('/carrinho/remover/' + productId, {
+                method: 'POST',
+                headers: {
+                    // CSRF header if needed; it depends on your Spring Security configuration
+                    // 'X-CSRF-TOKEN': token
+                }
+            }).then(response => {
+                return response.json(); // Assuming your endpoint returns the updated cart
+            }).then(updatedCart => {
+                alert(updatedCart.message); // Alert the message from the server
+                atualizarCarrinho(updatedCart); // Update the cart with the updated cart information
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        }
+        
+        
+                
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add to cart button listener
+            var addToCartButtons = document.querySelectorAll('.add-to-cart-button');
+            addToCartButtons.forEach(function(button) {
+                button.addEventListener('click', function () {
+                    var productId = this.getAttribute('data-product-id');
+                    adicionarAoCarrinho(productId);
+                });
+            });
+
+            // Clear cart button listener
+            var limparCarrinhoButton = document.getElementById('limpar-carrinho');
             limparCarrinhoButton.addEventListener('click', function () {
                 fetch('/carrinho/limpar', { method: 'POST' })
                     .then(function (response) {
                         return response.json();
                     })
                     .then(function (data) {
-                        var message = data.message;
-                        alert(message);
+                        alert(data.message);
                         atualizarCarrinho();
                     });
             });
+
+            // Initial cart update
+            atualizarCarrinho();
         });
-        atualizarCarrinho();
     </script>
 </body>
 </html>

@@ -100,14 +100,26 @@ public class BdprojectController {
         return response;
     }
 
+    @PostMapping("/carrinho/remover/{id}")
+    @ResponseBody
+    public Map<String, Object> removerItem(@PathVariable Long id, @ModelAttribute("carrinho") Carrinho carrinho) {
+        Map<String, Object> response = new HashMap<>();
+        carrinho.removerItem(id);
+        response.put("itens", carrinho.getItens()); // Send the updated items list back
+        response.put("message", "Item removido com sucesso."); // Make sure this line is uncommented
+        return response;
+    }
+    
+    
     @PostMapping("/carrinho/adicionar/{id}")
     @ResponseBody
     public Map<String, Object> adicionarAoCarrinho(@PathVariable Long id, @ModelAttribute("carrinho") Carrinho carrinho, Model model) {
         Map<String, Object> response = new HashMap<>();
 
         carrinho.adicionarItem(jdbcTemplate, id);
+        // response.put("message", "Produto adicionado ao carrinho com sucesso.");
+        response.put("itens", carrinho.getItens());
 
-        response.put("message", "Produto adicionado ao carrinho com sucesso.");
         return response;
     }
 

@@ -25,7 +25,6 @@ public class Carrinho {
                     break;
                 }
             }
-            // Se não existe, adiciona o produto ao carrinho
             if (!produtoExiste) {
                 produtoMap.put("quantidade", 1); // Define a quantidade inicial como 1
                 itens.add(produtoMap);
@@ -38,11 +37,23 @@ public class Carrinho {
         itens.clear();
     }
     
-    public void removerItem(int index) {
-        if (index >= 0 && index < itens.size()) {
-            itens.remove(index);
+    public void removerItem(Long produtoId) {
+        // Assuming there's a map for item quantities where the key is the product ID
+        for (Map<String, Object> item : itens) {
+            Long itemId = ((Number) item.get("id_produto")).longValue();
+            if (produtoId.equals(itemId)) {
+                int quantity = (Integer) item.get("quantidade");
+                if (quantity > 1) {
+                    item.put("quantidade", quantity - 1);
+                } else {
+                    itens.remove(item);
+                }
+                break;
+            }
         }
     }
+    
+    
 
     public List<Map<String, Object>> getItens() {
         return itens;
