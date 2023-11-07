@@ -37,23 +37,30 @@
     
     <script type="text/javascript">
         // Function to update the cart
-        function atualizarCarrinho(updatedCart) {
-            const cartItemsList = document.getElementById('cart-items-list');
-            cartItemsList.innerHTML = ''; // Clear the cart items list
-        
-            updatedCart.forEach(function (item) {
-                var listItem = document.createElement('li');
-                listItem.setAttribute('id', 'cart-item-' + item.id_produto);
-                listItem.textContent = "Nome: " + item.nome + " - Preço: $" + item.preco + " - Quantidade: " + item.quantidade;
-                var deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Delete';
-                deleteButton.onclick = function() { deleteCartItem(item.id_produto); };
-                listItem.appendChild(deleteButton);
-        
-                cartItemsList.appendChild(listItem);
-            });
+        function atualizarCarrinho() {
+            fetch('/carrinho') 
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    var cartItems = data.itens;
+                    var cartItemsList = document.getElementById('cart-items');
+                    
+                    cartItemsList.innerHTML = '';
+                    cartItems.forEach(function (item) {
+                        var listItem = document.createElement('li');
+                        listItem.setAttribute('id', 'cart-item-' + item.id_produto); // Set the ID for the list item
+                        listItem.textContent = "Nome: " + item.nome + " - Preço: $" + item.preco + " - Quantidade: " + item.quantidade;
+                        var deleteButton = document.createElement('button');
+                        deleteButton.textContent = 'Delete';
+                        deleteButton.onclick = function() { deleteCartItem(item.id_produto); };
+                        listItem.appendChild(deleteButton);
+                    
+                        cartItemsList.appendChild(listItem);
+                    });
+                    
+                }); 
         }
-        
 
         // Function to add a product to the cart
         function adicionarAoCarrinho(productId) {
@@ -82,16 +89,19 @@
                     // 'X-CSRF-TOKEN': token
                 }
             }).then(response => {
-                return response.json(); // Assuming your endpoint returns the updated cart
-            }).then(updatedCart => {
-                alert(updatedCart.message); // Alert the message from the server
-                atualizarCarrinho(updatedCart); // Update the cart with the updated cart information
+                return response.json(); // Assuming your endpoint returns a JSON response
+            }).then(data => {
+                alert(data.message); // Alert the message from the server
+                var itemElement = document.getElementById('cart-item-' + productId);
+                if (itemElement) {
+                    itemElement.remove(); // This will remove the item from the DOM
+                }
+                atualizarCarrinho(); // Update the cart
             }).catch(error => {
                 console.error('Error:', error);
             });
         }
-        
-        
+
                 
         document.addEventListener('DOMContentLoaded', function () {
             // Add to cart button listener
