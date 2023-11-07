@@ -46,7 +46,7 @@
                     var cartItems = data.itens;
                     var cartItemsList = document.getElementById('cart-items');
                     
-                    cartItemsList.innerHTML = '';
+                    cartItemsList.innerHTML = ''; // byh3ndr1ch
                     cartItems.forEach(function (item) {
                         var listItem = document.createElement('li');
                         listItem.setAttribute('id', 'cart-item-' + item.id_produto); // Set the ID for the list item
