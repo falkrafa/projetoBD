@@ -66,10 +66,7 @@
         function adicionarAoCarrinho(productId) {
             fetch('/carrinho/adicionar/' + productId, {
                 method: 'POST',
-                headers: {
-                    // Add CSRF header if needed; depends on your Spring Security configuration
-                    // 'X-CSRF-TOKEN': token
-                }
+                headers: {}
             }).then(response => {
                 return response.json(); // Assuming your endpoint returns a JSON response
             }).then(data => {

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+</head>
+<body>
+
+    <h2>Registration Form</h2>
+
+    <form action="/register" method="post">
+
+        <!-- Shared fields for all user types (Inherited from 'pessoa') -->
+        <fieldset>
+            <legend>Informações pessoais:</legend>
+            
+            <label for="name">Nome Completo:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="name">CPF(lembre-se de usar . e -):</label>
+            <input type="text" id="cpf" name="cpf" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </fieldset>
+        
+        <!-- Specific fields for 'cliente' -->
+        <fieldset id="cliente-fields" style="display:none;">
+            <legend>Informações do Cliente:</legend>
+            
+            <!-- Example of specific client field -->
+            <label for="phone">Telefone Principal:</label><br><br>
+            <input type="tel" id="phone" name="phone" placeholder="(81) 9xxxx-xxxx" pattern="\([0-9]{2}\)\s9[0-9]{4}-[0-9]{4}"
+            required><br><br>
+            <small>Format: (81) 91234-5678</small><br><br>
+            <input type="submit">
+
+            <label for="telefone2"> Telefone secundario:</label>
+            <input type="text" id="client-id" name="client_id">
+        </fieldset>
+        
+        <!-- Specific fields for 'funcionario' -->
+        <fieldset id="funcionario-fields" style="display:none;">
+            <legend> Informações do Funcionario:</legend>
+            
+            <!-- Example of specific employee field -->
+            <label for="id-gerente"> Id do seu Gerente:</label>
+            <input type="text" id="id-gerente" name="id-gerente">
+            
+            <label for="cargo">Cargo:</label>
+            <input type="text" id="cargo" name="cargo">
+        </fieldset>
+
+        <!-- User type selection -->
+        <label for="user-type">Registering as:</label>
+        <select id="user-type" name="user_type" onchange="showFields()">
+            <option value="">Select...</option>
+            <option value="cliente">Cliente</option>
+            <option value="funcionario">Funcionario</option>
+        </select>
+
+        <input type="submit" value="Register">
+    </form>
+
+    <script>
+        function showFields() {
+            var userType = document.getElementById('user-type').value;
+            var clienteFields = document.getElementById('cliente-fields');
+            var funcionarioFields = document.getElementById('funcionario-fields');
+            
+            // Hide all fields initially
+            clienteFields.style.display = 'none';
+            funcionarioFields.style.display = 'none';
+            
+            // Show the fields relevant to the selected user type
+            if(userType === 'cliente') {
+                clienteFields.style.display = 'block';
+            } else if(userType === 'funcionario') {
+                funcionarioFields.style.display = 'block';
+            }
+        }
+    </script>
+
+</body>
+</html>

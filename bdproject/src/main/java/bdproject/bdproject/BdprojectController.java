@@ -117,10 +117,17 @@ public class BdprojectController {
         Map<String, Object> response = new HashMap<>();
 
         carrinho.adicionarItem(jdbcTemplate, id);
-        // response.put("message", "Produto adicionado ao carrinho com sucesso.");
         response.put("itens", carrinho.getItens());
-
+        response.put("message", "Item adicionado com sucesso."); 
         return response;
+    }
+
+    @GetMapping("/registro")
+    public String showRegisterPage(@ModelAttribute("user") CustomUser user) {
+        if (user.isLoggedIn()) {
+            return "redirect:/";
+        }
+        return "components/registro";
     }
 
 
