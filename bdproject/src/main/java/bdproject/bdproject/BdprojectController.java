@@ -1,6 +1,7 @@
 package bdproject.bdproject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -77,8 +78,9 @@ public class BdprojectController {
     }
 
     @GetMapping("/logout")
-    public String logout(@ModelAttribute("user") CustomUser user) {
+    public String logout(@ModelAttribute("user") CustomUser user, @ModelAttribute("carrinho") Carrinho carrinho) {
         user.setLoggedIn(false);
+        carrinho.limparCarrinho();
         return "redirect:/";
     }
 
@@ -129,6 +131,60 @@ public class BdprojectController {
         }
         return "components/registro";
     }
+    @PostMapping("/registro")
+    @ResponseBody
+    public Map<String, Object> register(
+            @RequestParam("name") String name,
+            @RequestParam("email") String email,
+            @RequestParam("password") String password,
+            @RequestParam("cpf") String cpf,
+            @RequestParam("user_type") String userType,
+            @RequestParam(value = "phone", required = false) String phone,
+            @RequestParam(value = "phone2", required = false) String phone2,
+            @RequestParam(value = "rua", required = false) String rua,
+            @RequestParam(value = "numero", required = false) Integer numero,
+            @RequestParam(value = "id-gerente", required = false) String idGerente,
+            @RequestParam(value = "cargoG", required = false) String cargoG,
+            @RequestParam(value = "cargo", required = false) String cargo) {
+        
+        Map<String, Object> response = new HashMap<>();
 
+            String sql = "select p.nome from pessoa p where p.email = ?";
+            List<Map<String, Object>> resultNomeregister1 = jdbcTemplate.queryForList(sql, email);
+            if (resultNomeregister1 != null && !resultNomeregister1.isEmpty()) {
+                response.put("error", "Já existe um usuário com este email.");
+                return response;
+            }
 
+            String sql2 = "select p.nome from pessoa p where p.cpf = ?";
+            List<Map<String, Object>> resultNomeRegister2 = jdbcTemplate.queryForList(sql2, cpf);
+            if (resultNomeRegister2 != null && !resultNomeRegister2.isEmpty()) {
+                response.put("error", "Já existe um usuário com este cpf.");
+                return response;
+            }
+
+        String insertPessoaSql = "INSERT INTO pessoa (cpf, nome, email, senha) VALUES (?, ?, ?, ?)";
+        jdbcTemplate.update(insertPessoaSql, cpf, name, email, password);
+
+        // Verificar o tipo de usuário selecionado e inserir na tabela apropriada
+        if ("cliente".equals(userType)) {
+            System.out.println("entrei em cliente");
+            String insertClienteSql = "INSERT INTO cliente (telefone, telefone2, rua, numero, cpf_pessoa_cliente) VALUES (?, ?, ?, ?, ?)";
+            if(phone2.isEmpty()){
+                phone2 = null;
+            }
+            jdbcTemplate.update(insertClienteSql, phone, phone2, rua, numero, cpf);
+            System.out.println("depois do update");
+        } 
+        else if ("funcionario".equals(userType)) {
+            String insertFuncionarioSql = "INSERT INTO funcionario (cargo, id_gerente, cpf_pessoa) VALUES (?, ?, ?)";
+            jdbcTemplate.update(insertFuncionarioSql, cargo, idGerente, cpf);
+        } else if ("gerente".equals(userType)) {
+            String insertGerenteSql = "INSERT INTO funcionario (cargo, id_gerente, cpf_pessoa) VALUES (?, null, ?)";           
+            jdbcTemplate.update(insertGerenteSql, cargoG, cpf);
+        }
+        
+        response.put("message", "Usuário registrado com sucesso.");
+        return response;
+    }
 }

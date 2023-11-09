@@ -9,9 +9,10 @@
 
     <h2>Registration Form</h2>
 
-    <form action="/register" method="post">
+    <form action="/registro" method="post" id="registerForm">
 
-        <!-- Shared fields for all user types (Inherited from 'pessoa') -->
+        <div id="error-message" style="color: red;"></div>
+
         <fieldset>
             <legend>Informações pessoais:</legend>
             
@@ -28,6 +29,7 @@
             <input type="password" id="password" name="password" required>
         </fieldset>
         
+        <input type="hidden" id="backend-error" name="backend_error" value="">
         <!-- Specific fields for 'cliente' -->
         <fieldset id="cliente-fields" style="display:none;">
             <legend>Informações do Cliente:</legend>
@@ -35,12 +37,18 @@
             <!-- Example of specific client field -->
             <label for="phone">Telefone Principal:</label><br><br>
             <input type="tel" id="phone" name="phone" placeholder="(81) 9xxxx-xxxx" pattern="\([0-9]{2}\)\s9[0-9]{4}-[0-9]{4}"
-            required><br><br>
+            ><br><br>
             <small>Format: (81) 91234-5678</small><br><br>
+            
+            <label for="phone2"> Telefone secundario:</label>
+            <input type="text" id="phone2" name="phone2" placeholder="(81) 9xxxx-xxxx" pattern="\([0-9]{2}\)\s9[0-9]{4}-[0-9]{4}"><br>
+            
+            <label for="rua"> Rua:</label>
+            <input type="text" id="rua" name="rua"><br>
+            
+            <label for="numero"> Numero:</label>
+            <input type="number" id="numero" name="numero"><br>
             <input type="submit">
-
-            <label for="telefone2"> Telefone secundario:</label>
-            <input type="text" id="client-id" name="client_id">
         </fieldset>
         
         <!-- Specific fields for 'funcionario' -->
@@ -53,6 +61,15 @@
             
             <label for="cargo">Cargo:</label>
             <input type="text" id="cargo" name="cargo">
+            <input type="submit">
+
+        </fieldset>
+
+        <fieldset id="gerente-fields" style="display:none;">
+            <legend> Informações do Gerente:</legend>
+            <label for="cargo">Cargo:</label>
+            <input type="text" id="cargoG" name="cargoG" value="Gerente" readonly>
+            <input type="submit">
         </fieldset>
 
         <!-- User type selection -->
@@ -61,9 +78,8 @@
             <option value="">Select...</option>
             <option value="cliente">Cliente</option>
             <option value="funcionario">Funcionario</option>
+            <option value="gerente">Gerente</option>
         </select>
-
-        <input type="submit" value="Register">
     </form>
 
     <script>
@@ -71,19 +87,76 @@
             var userType = document.getElementById('user-type').value;
             var clienteFields = document.getElementById('cliente-fields');
             var funcionarioFields = document.getElementById('funcionario-fields');
-            
+            var gerenteFields = document.getElementById('gerente-fields');
+    
             // Hide all fields initially
             clienteFields.style.display = 'none';
             funcionarioFields.style.display = 'none';
-            
+            gerenteFields.style.display = 'none';
+    
             // Show the fields relevant to the selected user type
-            if(userType === 'cliente') {
+            if (userType === 'cliente') {
                 clienteFields.style.display = 'block';
-            } else if(userType === 'funcionario') {
+            } else if (userType === 'funcionario') {
                 funcionarioFields.style.display = 'block';
+            } else if (userType === 'gerente') {
+                gerenteFields.style.display = 'block';
+            }
+    
+            // Adjust required attribute dynamically
+            adjustRequiredAttribute(userType);
+        }
+    
+        function adjustRequiredAttribute(userType) {
+            var phone = document.getElementById('phone');
+            var phone2 = document.getElementById('phone2');
+            var rua = document.getElementById('rua');
+            var numero = document.getElementById('numero');
+            var idGerente = document.getElementById('id-gerente');
+            var cargo = document.getElementById('cargo');
+            var cargoG = document.getElementById('cargoG');
+
+            [phone, phone2, rua, numero, idGerente, cargo, cargoG].forEach(function (field) {
+                field.required = false;
+                field.setCustomValidity('');
+            });
+
+            if (userType === 'cliente') {
+                phone.required = true;
+                rua.required = true;
+                numero.required = true;
+            } else if (userType === 'funcionario') {
+                idGerente.required = true;
+                cargo.required = true;
+            } else if (userType === 'gerente') {
+                cargoG.required = true;
             }
         }
+
+    
+        document.getElementById('registerForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+    
+            fetch("/registro", {
+                method: "POST",
+                body: new FormData(document.querySelector("form")),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('backend-error').value = data.error;
+                        document.getElementById('error-message').innerHTML = data.error;
+                    } else {
+                        alert(data.message);
+                        window.location.href = "/login";
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro na requisição fetch:', error);
+                });
+        });
     </script>
+    
 
 </body>
 </html>

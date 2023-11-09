@@ -13,6 +13,7 @@
         <input type="password" id="senha" name="senha" required><br>
         <input type="submit" value="Login" id="loginButton">
     </form>
+    <p>Ainda nao possui uma conta? <a th:href="@{/registro}">clique aqui</a></p>
     <p id="loginError"></p>
     <script>
         document.getElementById("loginForm").addEventListener("submit", function(event) {
