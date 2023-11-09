@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@SessionAttributes(value = {"user", "resultNomeLogin", "CartItem","carrinho"})
+@SessionAttributes(value = {"user", "resultNomeLogin", "CartItem","carrinho", "resultNomeUpdate"})
 public class BdprojectController {
 
     @Autowired
@@ -64,7 +64,7 @@ public class BdprojectController {
     public Map<String, Object> login(@RequestParam("email") String email, @RequestParam("senha") String senha, @ModelAttribute("user") CustomUser user, Model model) {
         Map<String, Object> response = new HashMap<>();
         
-        String sql = "select p.nome from pessoa p where p.email = ? and p.senha = ?";
+        String sql = "select p.nome, c.id_cliente from pessoa p join cliente c on c.cpf_pessoa_cliente = p.cpf where p.email = ? and p.senha = ?";
         List<Map<String, Object>> resultNomeLogin = jdbcTemplate.queryForList(sql, email, senha);
         model.addAttribute("resultNomeLogin", resultNomeLogin);
         
@@ -186,5 +186,34 @@ public class BdprojectController {
         
         response.put("message", "Usuário registrado com sucesso.");
         return response;
+    }
+
+    @GetMapping("/updatePassword")
+    public String showUpdatePasswordPage(@ModelAttribute("user") CustomUser user) {
+        return "components/changePassword";
+    }
+    @PostMapping("/updatePassword")
+    @ResponseBody
+     public Map<String, Object> updatePassword (@RequestParam("email") String email, @RequestParam("password") String senha, @ModelAttribute("user") CustomUser user, Model model) {
+        System.out.println(senha);
+        System.out.println(email);
+        Map<String, Object> response = new HashMap<>();
+        if(!email.isEmpty() && senha.isEmpty() || senha == null){
+            String sql = "select p.nome from pessoa p where p.email = ?";
+            List<Map<String, Object>> resultNomeUpdate = jdbcTemplate.queryForList(sql, email);
+            model.addAttribute("resultNomeUpdate", resultNomeUpdate);
+            if(resultNomeUpdate.isEmpty()){
+                response.put("existe", false);
+            }
+            response.put("existe", true);
+        }
+        else if(!senha.isEmpty()){
+            String updatePasswordSql = "UPDATE pessoa SET senha = ? WHERE email = ?";
+            jdbcTemplate.update(updatePasswordSql, senha, email);
+            response.put("trocada", true);
+            user.setLoggedIn(true);
+        }
+        return response;
+
     }
 }

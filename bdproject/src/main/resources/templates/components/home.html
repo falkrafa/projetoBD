@@ -7,10 +7,11 @@
 <body>
     <div th:if="${user.isLoggedIn}">
         <a th:href="@{/logout}">Logout</a>
-        <div th:if="${resultNomeLogin != null}">
-            <p>Ola: <span th:text="${resultNomeLogin[0]['nome']}"></span></p>
+        <div th:if="${resultNomeLogin != null or resultNomeUpdate != null}">
+            <p>Ola: <span th:text="${resultNomeLogin != null ? resultNomeLogin[0]['nome'] : resultNomeUpdate[0]['nome']}"></span></p>
         </div>
     </div>
+    
     <div th:unless="${user.isLoggedIn}">
         <p>Não logado</p>
         <a th:href="@{/login}">Login</a>
