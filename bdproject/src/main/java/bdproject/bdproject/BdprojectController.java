@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @Controller
-@SessionAttributes(value = {"user", "resultNomeLogin", "CartItem","carrinho", "resultNomeUpdate"})
+@SessionAttributes(value = {"user", "resultNomeLogin", "CartItem","carrinho", "resultNomeUpdate","resultadoReview"})
 public class BdprojectController {
 
     @Autowired
@@ -46,8 +48,15 @@ public class BdprojectController {
                 "from produto p \r\n" + //
                 "join categoria c on p.fk_id_categoria = c.id_categoria\r\n" + //
                 "where p.id_produto = ?";
+        String sql2 = "select p.nome as nomeReview, r.descricao as descricaoReview from cliente_faz_review_produto cfrp\r\n" + //
+                "join cliente c on c.id_cliente = cfrp.fk_id_cliente  \r\n" + //
+                "join pessoa p on p.cpf = c.cpf_pessoa_cliente \r\n" + //
+                "join review r on cfrp.fk_id_review = r.id_review\r\n" + //
+                "where cfrp.fk_id_produto = ?";
         List<Map<String, Object>> resultado = jdbcTemplate.queryForList(sql, id);
+        List<Map<String, Object>> resultadoReview = jdbcTemplate.queryForList(sql2, id);
         model.addAttribute("resultado", resultado);
+        model.addAttribute("resultadoReview", resultadoReview);
         return "components/produto";
     }
 
@@ -216,4 +225,37 @@ public class BdprojectController {
         return response;
 
     }
+
+    @PostMapping("/makeReview")
+    @ResponseBody
+    public Map<String, Object> makeReview(@RequestBody Map<String, Object> reviewData) {
+        Map<String, Object> response = new HashMap<>();
+
+        String id_produto_reviewString = (String) reviewData.get("id_produto_review");
+        String descricao = (String) reviewData.get("descricao");
+        String notaString = (String) reviewData.get("nota");
+        String id_clienteString = (String) reviewData.get("id_cliente");
+
+        Long id_produto_review = Long.parseLong(id_produto_reviewString);
+        Long nota = Long.parseLong(notaString);
+        Long id_cliente = Long.parseLong(id_clienteString);
+
+        System.out.println(id_produto_review);
+        System.out.println(descricao);
+        System.out.println(nota);
+
+        String sql = "INSERT INTO review (descricao, nota) VALUES (?, ?);";
+        jdbcTemplate.update(sql, descricao, nota);
+
+        Long reviewId = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID();", Long.class);
+        System.out.println(reviewId);
+
+        String sql2 = "INSERT INTO cliente_faz_review_produto (fk_id_cliente, fk_id_produto, fk_id_review) VALUES (?, ?, ?);";
+        jdbcTemplate.update(sql2, id_cliente, id_produto_review, reviewId);
+
+        response.put("sucesso", "Review feita com sucesso.");
+        
+        return response;
+    }
+
 }

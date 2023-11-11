@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Detalhes do Produto</title>
+        <link th:href="@{/styles/css/produto.css}" rel="stylesheet" />
 </head>
 <body>
     <h1>Detalhes do Produto</h1>
@@ -21,14 +22,56 @@
             <td th:text="${row['NomeCategoria']}"></td>
             <td>
                 <button th:attr="data-product-id=${row['idProduto']}" class="add-to-cart-button">Adicionar ao Carrinho</button>
-            </td>       
+            </td>     
         </tr>
     </table>
+    <table th:if="${not #lists.isEmpty(resultadoReview)}">
+        <tr>
+            <th>NOME</th>
+            <th>Review</th>
+        </tr>
+        <tr th:each="resultado: ${resultadoReview}">
+            <td th:text="${resultado['nomeReview']}"></td>
+            <td th:text="${resultado['descricaoReview']}"></td>
+        </tr>
+    </table>
+    <div th:if="${#lists.isEmpty(resultadoReview)}">
+        <p>Nenhum review disponível.</p>
+    </div>
+
+    
+    <div th:if="${not #lists.isEmpty(resultNomeLogin)}">
+        <button id="addReviewButton" class="add-review-button" th:attr="data-id-produto-review=${resultado[0]['idProduto']}, data-id-cliente=${resultNomeLogin[0]['id_cliente']}, userLogged=${user.isLoggedIn}">Adicionar Review</button>
+
+    </div>
+    
+    <div th:if="${#lists.isEmpty(resultNomeLogin)}">
+        <button class="add-review-button" th:attr="userLogged=${user.isLoggedIn}">Adicionar Review</button>
+    </div>
+    
+
+<div id="reviewModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Adicionar Review</h2>
+    <form id="reviewForm">
+      <label for="nota">Nota:</label>
+      <input type="number" id="nota" name="nota" min="1" max="5" required>
+      
+      <label for="descricao">Descrição:</label>
+      <textarea id="descricao" name="descricao"></textarea>
+      
+      <button type="submit">Adicionar Review</button>
+    </form>
+  </div>
+</div>
+
+
     <script type="text/javascript">
         document.querySelectorAll('.add-to-cart-button').forEach(function(button) {
             button.addEventListener('click', function() {
                 var productId = this.getAttribute('data-product-id');
-                             
+                            
                 fetch('/carrinho/adicionar/' + productId, { method: 'POST' })
                     .then(function (response) {
                         return response.json();
@@ -39,8 +82,62 @@
                             alert(message)
                         }
                 });
-                console.log(productId);
             });
+        });
+        document.querySelectorAll('.add-review-button').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var userLogged = this.getAttribute('userLogged');
+                if(userLogged == 'true'){
+                    document.getElementById('reviewModal').style.display = 'block';
+                }
+                else{
+                    window.location.href = '/login';
+                }
+            });
+        });
+        document.getElementById('reviewForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+
+       var id_produto_review = document.getElementById('addReviewButton').getAttribute('data-id-produto-review');
+        var id_cliente = document.getElementById('addReviewButton').getAttribute('data-id-cliente');
+
+
+
+        
+        console.log("teste: " + id_produto_review);
+        console.log(id_cliente);
+
+        fetch('/makeReview', {
+            method: 'POST',
+            body: JSON.stringify({
+                nota: document.getElementById('nota').value,
+                descricao: document.getElementById('descricao').value,
+                id_produto_review: id_produto_review,
+                id_cliente: id_cliente
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.sucesso);
+            document.getElementById('reviewModal').style.display = 'none';
+            location.reload();
+        });
+
+    });
+
+
+        document.querySelector('.close').addEventListener('click', function() {
+            document.getElementById('reviewModal').style.display = 'none';
+        });
+
+        window.addEventListener('click', function(event) {
+            if (event.target === document.getElementById('reviewModal')) {
+            document.getElementById('reviewModal').style.display = 'none';
+            }
         });
     </script>
 </body>
