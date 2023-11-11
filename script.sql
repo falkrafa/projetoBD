@@ -10,6 +10,8 @@ CREATE TABLE Pessoa (
 
 select * from pessoa p
 
+
+
 select * from cliente c 
 
 select * from funcionario f 
@@ -25,15 +27,15 @@ ADD CONSTRAINT email_Pessoa_ck CHECK (email LIKE '%@%.%');
 ALTER TABLE Pessoa
 ADD CONSTRAINT cpf_Pessoa_ck CHECK (cpf LIKE '___.___.___-__');
 
-create table Funcionario(
-id_funcionario int auto_increment,
-cargo varchar(100) not null,
-id_gerente int,
-cpf_pessoa varchar(14),
-constraint pk_funcionario primary key (id_funcionario),
-constraint cpf_pessoa_fk foreign key (cpf_pessoa) references Pessoa(cpf) on delete cascade,
-constraint funcionario_id_gerente_fk foreign key (id_gerente) references Funcionario(id_funcionario) on delete cascade
+CREATE TABLE Funcionario (
+id_funcionario INT AUTO_INCREMENT PRIMARY KEY,
+cargo VARCHAR(100) NOT NULL,
+id_gerente INT,
+cpf_pessoa VARCHAR(14) UNIQUE NOT NULL,
+CONSTRAINT cpf_pessoa_fk FOREIGN KEY (cpf_pessoa) REFERENCES Pessoa(cpf) ON DELETE CASCADE,
+CONSTRAINT funcionario_id_gerente_fk FOREIGN KEY (id_gerente) REFERENCES Funcionario(id_funcionario) ON DELETE CASCADE
 );
+
 
 
 create table Cliente (
@@ -42,8 +44,8 @@ telefone varchar(50),
 telefone2 varchar(50),
 rua varchar(100),
 numero int,
-cpf_pessoa_cliente varchar(14),
-primary key (id_cliente, cpf_pessoa_cliente),
+cpf_pessoa_cliente varchar(14) unique not null,
+primary key (id_cliente),
 constraint id_cliente_fk foreign key (cpf_pessoa_cliente) references Pessoa (cpf) on delete cascade
 );
 
@@ -80,7 +82,7 @@ nome varchar(100)
 );
 
 create table Produto(
-id_produto int,
+id_produto int auto_increment,
 nome varchar(100),
 preco float,
 descricao varchar(500),
@@ -99,8 +101,15 @@ fk_id_review int,
 fk_id_produto int,
 constraint fk_id_cliente_faz foreign key(fk_id_cliente) references Cliente(id_cliente) on delete cascade,
 constraint fk_id_review_faz foreign key(fk_id_review) references Review(id_review) on delete cascade,
-constraint fk_id_produto_faz foreign key(fk_id_produto) references Produto(id_produto) on delete cascade
+constraint fk_id_produto_faz foreign key(fk_id_produto) references Produto(id_produto) on delete cascade,
+primary key(fk_id_review, fk_id_produto)
 );
+
+select p.nome as nomeReview, r.descricao as descricaoReview, r.nota as notaReview from cliente_faz_review_produto cfrp 
+join cliente c on c.id_cliente = cfrp.fk_id_cliente  
+join pessoa p on p.cpf = c.cpf_pessoa_cliente 
+join review r on cfrp.fk_id_review = r.id_review
+where cfrp.fk_id_produto = 1
 
 create table Responde(
 fk_id_funcionario int,
@@ -109,6 +118,7 @@ resposta varchar(500),
 constraint fk_id_funcionario_responde foreign key (fk_id_funcionario) references Funcionario(id_funcionario) on delete cascade,
 constraint fk_id_review_responde foreign key (fk_id_review) references Review(id_review) on delete cascade
 );
+
 
 create table fornecedor(
 id_fornecedor int primary key,
@@ -151,7 +161,11 @@ INSERT INTO Funcionario (cargo, id_gerente, cpf_pessoa) VALUES ('Atendente', 1, 
 INSERT INTO Cliente (telefone, telefone2, rua, numero, cpf_pessoa_cliente) VALUES ('111-222-3333', NULL, 'Rua C', 789, '111.222.333-44');
 INSERT INTO Cliente (telefone, telefone2, rua, numero, cpf_pessoa_cliente) VALUES ('555-666-7777', NULL, 'Rua D', 123, '555.666.777-88');
 
-select * from cliente
+select * from Funcionario
+
+delete from Funcionario where cpf_pessoa = '123.456.789-11'
+
+delete from Cliente c where c.cpf_pessoa_cliente = '111.222.333-44';
 
 
 
@@ -165,8 +179,12 @@ INSERT INTO pedido (status, data_envio, data_chegada, data_prevista, fk_cliente_
 INSERT INTO pedido (status, data_envio, data_chegada, data_prevista, fk_cliente_id, fk_id_transportadora) VALUES ('Processando', '2023-11-06', NULL, '2023-11-20', 2, 2);
 
 -- Inserções na tabela review
-INSERT INTO review (id_review, descricao, nota) VALUES (1, 'Ótimo produto!', 5.0);
-INSERT INTO review (id_review, descricao, nota) VALUES (2, 'Bom serviço de entrega.', 4.0);
+INSERT INTO review (descricao, nota) VALUES ('Ótimo produto!', 5.0);
+INSERT INTO review (descricao, nota) VALUES ('Bom serviço de entrega.', 4.0);
+
+select * from cliente
+
+SELECT LAST_INSERT_ID();
 
 -- Inserções na tabela Categoria
 INSERT INTO Categoria (id_categoria, nome) VALUES (1, 'Eletrônicos');
@@ -187,9 +205,18 @@ select * from produto
 INSERT INTO cliente_faz_review_produto (fk_id_cliente, fk_id_review, fk_id_produto) VALUES (1, 1, 1);
 INSERT INTO cliente_faz_review_produto (fk_id_cliente, fk_id_review, fk_id_produto) VALUES (2, 2, 2);
 
+SELECT LAST_INSERT_ID();
+select * from cliente_faz_review_produto cfrp 
+
+select * from cliente
+
+select * from review
+
+select * from funcionario f 
+
 -- Inserções na tabela Responde
 INSERT INTO Responde (fk_id_funcionario, fk_id_review, resposta) VALUES (1, 1, 'Agradecemos pelo seu feedback!');
-INSERT INTO Responde (fk_id_funcionario, fk_id_review, resposta) VALUES (2, 2, 'Estamos trabalhando para melhorar nossas entregas.');
+INSERT INTO Responde (fk_id_funcionario, fk_id_review, resposta) VALUES (5, 2, 'Estamos trabalhando para melhorar nossas entregas.');
 
 -- Inserções na tabela fornecedor
 INSERT INTO fornecedor (id_fornecedor, nome, telefone) VALUES (1, 'Fornecedor A', '555-111-2222');
@@ -202,9 +229,10 @@ INSERT INTO Possui (fk_id_produto, fk_id_fornecedor) VALUES (2, 2);
 select * from pedido
 
 -- Inserções na tabela Contem
-INSERT INTO Contem (fk_id_produto, fk_id_pedido, quantidade) VALUES (1,2, 2);
-INSERT INTO Contem (fk_id_produto, fk_id_pedido, quantidade) VALUES (2, 3, 3);
+INSERT INTO Contem (fk_id_produto, fk_id_pedido, quantidade) VALUES (1, 1, 2);
+INSERT INTO Contem (fk_id_produto, fk_id_pedido, quantidade) VALUES (2, 2, 3);
 
+select * from pedido
 
 select * from produto
 
