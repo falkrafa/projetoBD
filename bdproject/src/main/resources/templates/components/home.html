@@ -3,19 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Lista de produtos</title>
+    <link th:href="@{/styles/css/home.css}" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-    <div th:if="${user.isLoggedIn}">
-        <a th:href="@{/logout}">Logout</a>
-        <div th:if="${resultNomeLogin != null or resultNomeUpdate != null}">
-            <p>Ola: <span th:text="${resultNomeLogin != null ? resultNomeLogin[0]['nome'] : resultNomeUpdate[0]['nome']}"></span></p>
+    <nav class="navbar">
+        <div class="user-info">
+            <div class="user-name" th:if="${user.isLoggedIn}">
+                <p class="name">Ola, <span th:text="${resultNomeLogin != null ? resultNomeLogin[0]['nome'] : resultNomeUpdate[0]['nome']}" id="resultNomeLogin" onclick="openUserOptions()"></span></p>
+                <div id="userOptions">
+                    <a href="/perfil">Ver meu perfil</a>
+                    <a href="/pedidos">Ver meus pedidos</a>
+                    <a th:href="@{/logout}" id="logout">Logout</a>
+                </div>
+            </div>
+            <a th:unless="${user.isLoggedIn}" th:href="@{/login}" id="login">Login</a>
         </div>
-    </div>
+        <div id="cart-symbol" onclick="toggleCartSidebar()"><i class="fa fa-shopping-cart" style="font-size:25px;"></i></div>
+    </nav>
     
-    <div th:unless="${user.isLoggedIn}">
-        <p>Não logado</p>
-        <a th:href="@{/login}">Login</a>
-    </div>
     
     <h1>Lista de produtos</h1>
     <table>
@@ -28,15 +34,52 @@
             </td>
         </tr>
     </table>
-    <div class="cart-sidebar">
+    <!-- <div id="cart-symbol" onclick="toggleCartSidebar()">🛒</div> -->
+
+    <div id="cart-sidebar" class="cart-sidebar">
         <h2>Carrinho de Compras</h2>
-        <ul id="cart-items">
-            <!-- Cart items will be updated here -->
-        </ul>
+        <ul id="cart-items"></ul>
         <button id="limpar-carrinho">Limpar Carrinho</button>
     </div>
+
     
     <script type="text/javascript">
+            function openUserOptions() {
+                var userOptions = document.getElementById("userOptions");
+                userOptions.style.display = "flex";
+        }
+        window.onclick = function (event) {
+            var userOptions = document.getElementById("userOptions");
+
+            if (userOptions) {
+                if (event.target !== userOptions && event.target !== document.getElementById("resultNomeLogin")) {
+                    console.log("Closing user options");
+                    userOptions.style.display = "none";
+                    console.log('Window clicked');
+                }
+            }
+
+            var cartSidebar = document.getElementById("cart-sidebar");
+            var cartSymbol = document.getElementById("cart-symbol");
+
+            if (
+                event.target !== cartSidebar &&
+                event.target !== cartSymbol &&
+                !cartSidebar.contains(event.target) &&
+                !cartSymbol.contains(event.target)
+            ) {
+                console.log('Closing cart sidebar');
+                cartSidebar.style.display = "none";
+            }
+        };
+
+        
+
+        function toggleCartSidebar() {
+            var cartSidebar = document.getElementById("cart-sidebar");
+            atualizarCarrinho();
+            cartSidebar.style.display = "flex";
+        }
         // Function to update the cart
         function atualizarCarrinho() {
             fetch('/carrinho') 

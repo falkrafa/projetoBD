@@ -210,8 +210,7 @@ public class BdprojectController {
     @PostMapping("/updatePassword")
     @ResponseBody
      public Map<String, Object> updatePassword (@RequestParam("email") String email, @RequestParam("password") String senha, @ModelAttribute("user") CustomUser user, Model model) {
-        System.out.println(senha);
-        System.out.println(email);
+
         Map<String, Object> response = new HashMap<>();
         if(!email.isEmpty() && senha.isEmpty() || senha == null){
             String sql = "select p.nome from pessoa p where p.email = ?";
