@@ -10,14 +10,18 @@
     <nav class="navbar">
         <div class="user-info">
             <div class="user-name" th:if="${user.isLoggedIn}">
-                <p class="name">Olá, <span th:text="${resultNomeLogin != null ? resultNomeLogin[0]['nome'] : (resultNomeUpdate != null ? resultNomeUpdate[0]['nome'] : resultNameProfile[0].nome)}" id="resultNomeLogin" onclick="openUserOptions()"></span></p>
-
+                <p class="name" th:if="${not #lists.isEmpty(resultNomeLogin) and #lists.isEmpty(nomeProfile)}">
+                    Olá, <span th:text="${resultNomeLogin[0]['nome']}" id="resultNomeLogin" onclick="openUserOptions()"></span>
+                </p>
+                <p class="name" th:if="${not #lists.isEmpty(resultNomeLogin) and not #lists.isEmpty(nomeProfile)}">
+                    Olá, <span th:text="${nomeProfile[0]['nome']}" id="resultNomeLogin" onclick="openUserOptions()"></span>
+                </p>
                 <div id="userOptions">
                     <a th:href="@{'/profile/' + ${resultNomeLogin[0]['id_cliente']}}">Ver meu perfil</a>
                     <a href="/pedidos">Ver meus pedidos</a>
                     <a th:href="@{/logout}" id="logout">Logout</a>
                 </div>
-            </div>
+            </div>  
             <a th:unless="${user.isLoggedIn}" th:href="@{/login}" id="login">Login</a>
         </div>
         <div id="cart-symbol" onclick="toggleCartSidebar()"><i class="fa fa-shopping-cart" style="font-size:25px;"></i></div>

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @Controller
-@SessionAttributes(value = {"user", "resultNomeLogin", "CartItem","carrinho", "resultNomeUpdate","resultadoReview, ResultNomeGerente","resultProfileUpdate","resultNameProfile"})
+@SessionAttributes(value = {"user", "resultNomeLogin", "CartItem","carrinho", "resultNomeUpdate","resultadoReview, ResultNomeGerente","resultProfileUpdate","nomeProfile"})
 public class BdprojectController {
 
     @Autowired
@@ -225,7 +225,6 @@ public class BdprojectController {
             String updatePasswordSql = "UPDATE pessoa SET senha = ? WHERE email = ?";
             jdbcTemplate.update(updatePasswordSql, senha, email);
             response.put("trocada", true);
-            user.setLoggedIn(true);
         }
         return response;
 
@@ -301,10 +300,10 @@ public class BdprojectController {
         String sql2 = "UPDATE cliente SET telefone = ?, telefone2 = ?, rua = ?, numero = ? WHERE id_cliente = ?";
         jdbcTemplate.update(sql2, telefone, telefone2, rua, numero, id_cliente);
 
-        String sql3 = "SELECT p.nome from pessoa p join cliente c on c.cpf_pessoa_cliente = p.cpf where c.id_cliente = ?";
-        List<Map<String, Object>> resultNameProfile = jdbcTemplate.queryForList(sql3, id_cliente);
-        System.out.println(resultNameProfile);
-        model.addAttribute("resultNameProfile", resultNameProfile);
+        String sql3 = "select p.nome from pessoa p join cliente c on c.cpf_pessoa_cliente = p.cpf where c.id_cliente = ?";
+
+        List<Map<String, Object>> nomeProfile = jdbcTemplate.queryForList(sql3, id_cliente);
+        model.addAttribute("nomeProfile", nomeProfile);
         response.put("sucesso", "Informações atualizadas com sucesso.");
         
         return response;
