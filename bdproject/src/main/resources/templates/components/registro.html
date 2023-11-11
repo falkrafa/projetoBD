@@ -53,17 +53,22 @@
         
         <!-- Specific fields for 'funcionario' -->
         <fieldset id="funcionario-fields" style="display:none;">
-            <legend> Informações do Funcionario:</legend>
+            <legend>Informações do Funcionário:</legend>
             
-            <!-- Example of specific employee field -->
-            <label for="id-gerente"> Id do seu Gerente:</label>
-            <input type="text" id="id-gerente" name="id-gerente">
+            <label for="gerente">Selecione o Gerente:</label>
+            <select id="gerente" name="id-gerente">
+                <option value="">Escolha um Gerente</option>
+             
+                <option th:each="gerente : ${resultNomeGerente}" 
+                        th:value="${gerente['id_funcionario']}" 
+                        th:text="${gerente['nome']}"></option>
+            </select>
             
             <label for="cargo">Cargo:</label>
             <input type="text" id="cargo" name="cargo">
             <input type="submit">
-
         </fieldset>
+        
 
         <fieldset id="gerente-fields" style="display:none;">
             <legend> Informações do Gerente:</legend>

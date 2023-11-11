@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @Controller
-@SessionAttributes(value = {"user", "resultNomeLogin", "CartItem","carrinho", "resultNomeUpdate","resultadoReview"})
+@SessionAttributes(value = {"user", "resultNomeLogin", "CartItem","carrinho", "resultNomeUpdate","resultadoReview, ResultNomeGerente"})
 public class BdprojectController {
 
     @Autowired
@@ -134,7 +134,13 @@ public class BdprojectController {
     }
 
     @GetMapping("/registro")
-    public String showRegisterPage(@ModelAttribute("user") CustomUser user) {
+    public String showRegisterPage(@ModelAttribute("user") CustomUser user, Model model) {
+
+        String sql = "select p. nome, f.id_funcionario from funcionario f \r\n" + //
+                "join pessoa p on p.cpf = f.cpf_pessoa \r\n" + //
+                "where cargo = 'Gerente'";
+        List<Map<String, Object>> resultNomeGerente = jdbcTemplate.queryForList(sql);
+        model.addAttribute("resultNomeGerente", resultNomeGerente);
         if (user.isLoggedIn()) {
             return "redirect:/";
         }
