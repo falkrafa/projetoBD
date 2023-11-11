@@ -10,9 +10,10 @@
     <nav class="navbar">
         <div class="user-info">
             <div class="user-name" th:if="${user.isLoggedIn}">
-                <p class="name">Ola, <span th:text="${resultNomeLogin != null ? resultNomeLogin[0]['nome'] : resultNomeUpdate[0]['nome']}" id="resultNomeLogin" onclick="openUserOptions()"></span></p>
+                <p class="name">Olá, <span th:text="${resultNomeLogin != null ? resultNomeLogin[0]['nome'] : (resultNomeUpdate != null ? resultNomeUpdate[0]['nome'] : resultNameProfile[0].nome)}" id="resultNomeLogin" onclick="openUserOptions()"></span></p>
+
                 <div id="userOptions">
-                    <a href="/perfil">Ver meu perfil</a>
+                    <a th:href="@{'/profile/' + ${resultNomeLogin[0]['id_cliente']}}">Ver meu perfil</a>
                     <a href="/pedidos">Ver meus pedidos</a>
                     <a th:href="@{/logout}" id="logout">Logout</a>
                 </div>

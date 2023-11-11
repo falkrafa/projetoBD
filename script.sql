@@ -105,12 +105,6 @@ constraint fk_id_produto_faz foreign key(fk_id_produto) references Produto(id_pr
 primary key(fk_id_review, fk_id_produto)
 );
 
-select p.nome as nomeReview, r.descricao as descricaoReview, r.nota as notaReview from cliente_faz_review_produto cfrp 
-join cliente c on c.id_cliente = cfrp.fk_id_cliente  
-join pessoa p on p.cpf = c.cpf_pessoa_cliente 
-join review r on cfrp.fk_id_review = r.id_review
-where cfrp.fk_id_produto = 1
-
 create table Responde(
 fk_id_funcionario int,
 fk_id_review int,
@@ -161,14 +155,6 @@ INSERT INTO Funcionario (cargo, id_gerente, cpf_pessoa) VALUES ('Atendente', 1, 
 INSERT INTO Cliente (telefone, telefone2, rua, numero, cpf_pessoa_cliente) VALUES ('111-222-3333', NULL, 'Rua C', 789, '111.222.333-44');
 INSERT INTO Cliente (telefone, telefone2, rua, numero, cpf_pessoa_cliente) VALUES ('555-666-7777', NULL, 'Rua D', 123, '555.666.777-88');
 
-select * from Funcionario
-
-delete from Funcionario where cpf_pessoa = '123.456.789-11'
-
-delete from Cliente c where c.cpf_pessoa_cliente = '111.222.333-44';
-
-
-
 -- Inserções na tabela Transportadora
 INSERT INTO Transportadora (id_transportadora, telefone, nome) VALUES (1, '555-123-4567', 'Transportadora A');
 INSERT INTO Transportadora (id_transportadora, telefone, nome) VALUES (2, '555-987-6543', 'Transportadora B');
@@ -182,10 +168,6 @@ INSERT INTO pedido (status, data_envio, data_chegada, data_prevista, fk_cliente_
 INSERT INTO review (descricao, nota) VALUES ('Ótimo produto!', 5.0);
 INSERT INTO review (descricao, nota) VALUES ('Bom serviço de entrega.', 4.0);
 
-select * from cliente
-
-SELECT LAST_INSERT_ID();
-
 -- Inserções na tabela Categoria
 INSERT INTO Categoria (id_categoria, nome) VALUES (1, 'Eletrônicos');
 INSERT INTO Categoria (id_categoria, nome) VALUES (2, 'Roupas');
@@ -196,23 +178,9 @@ INSERT INTO Produto (id_produto, nome, preco, descricao, fk_id_categoria) VALUES
 
 INSERT INTO Produto (id_produto, nome, preco, descricao, fk_id_categoria) VALUES (3, 'Laptop', 999.99, 'High-performance laptop', 1);
 
-delete from produto where id_produto = 3
-
-select * from produto
-
-
 -- Inserções na tabela cliente_faz_review_produto
 INSERT INTO cliente_faz_review_produto (fk_id_cliente, fk_id_review, fk_id_produto) VALUES (1, 1, 1);
 INSERT INTO cliente_faz_review_produto (fk_id_cliente, fk_id_review, fk_id_produto) VALUES (2, 2, 2);
-
-SELECT LAST_INSERT_ID();
-select * from cliente_faz_review_produto cfrp 
-
-select * from cliente
-
-select * from review
-
-select * from funcionario f 
 
 -- Inserções na tabela Responde
 INSERT INTO Responde (fk_id_funcionario, fk_id_review, resposta) VALUES (1, 1, 'Agradecemos pelo seu feedback!');
@@ -225,20 +193,8 @@ INSERT INTO fornecedor (id_fornecedor, nome, telefone) VALUES (2, 'Fornecedor B'
 -- Inserções na tabela Possui
 INSERT INTO Possui (fk_id_produto, fk_id_fornecedor) VALUES (1, 1);
 INSERT INTO Possui (fk_id_produto, fk_id_fornecedor) VALUES (2, 2);
-
-select * from pedido
-
 -- Inserções na tabela Contem
 INSERT INTO Contem (fk_id_produto, fk_id_pedido, quantidade) VALUES (1, 1, 2);
 INSERT INTO Contem (fk_id_produto, fk_id_pedido, quantidade) VALUES (2, 2, 3);
 
-select * from pedido
 
-select * from produto
-
-select * from cliente
-
-select p.nome as nomeProduto, p.preco as PrecoProduto, p.descricao as DescricaoProduto, c.nome as NomeCategoria
-from produto p 
-join categoria c on p.fk_id_categoria = c.id_categoria
-where p.id_produto = 1

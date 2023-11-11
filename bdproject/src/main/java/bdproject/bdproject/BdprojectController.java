@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @Controller
-@SessionAttributes(value = {"user", "resultNomeLogin", "CartItem","carrinho", "resultNomeUpdate","resultadoReview, ResultNomeGerente"})
+@SessionAttributes(value = {"user", "resultNomeLogin", "CartItem","carrinho", "resultNomeUpdate","resultadoReview, ResultNomeGerente","resultProfileUpdate","resultNameProfile"})
 public class BdprojectController {
 
     @Autowired
@@ -262,5 +262,52 @@ public class BdprojectController {
         
         return response;
     }
+        @GetMapping("/profile/{id}")
+    public String showUpdateProfile(@PathVariable("id") Long id_cliente, @ModelAttribute("user")  CustomUser user, Model model) {
 
+        // quero que o usuario veja os dados dele e tenha a opcao de modificar
+        if( user.isLoggedIn() == false){
+            return "redirect:/";
+        }
+        String sql = "select p.nome, p.email, c.telefone, c.telefone2, c.rua, c.numero, c.id_cliente from pessoa p join cliente c on c.cpf_pessoa_cliente = p.cpf where c.id_cliente = ?";
+        
+        List<Map<String, Object>> resultProfileUpdate = jdbcTemplate.queryForList(sql, id_cliente);
+        model.addAttribute("resultProfileUpdate", resultProfileUpdate);
+        return "components/profile";
+    }
+    @PostMapping("/atualizarInformacoes")
+    @ResponseBody
+    public Map<String, Object> atualizarInformacoes(@RequestBody Map<String, Object> updateData , Model model) {
+        Map<String, Object> response = new HashMap<>();
+
+        String id_clienteString = (String) updateData.get("id_cliente");
+        String nome = (String) updateData.get("nome");
+        String email = (String) updateData.get("email");
+        String telefone = (String) updateData.get("telefone");
+        String telefone2 = (String) updateData.get("telefone2");
+        String rua = (String) updateData.get("rua");
+        String numeroString = (String) updateData.get("numero");
+
+        Long id_cliente = Long.parseLong(id_clienteString);
+        Long numero = Long.parseLong(numeroString);
+
+        String sql = "UPDATE pessoa p \r\n" + //
+                "JOIN cliente c ON c.cpf_pessoa_cliente = p.cpf \r\n" + //
+                "SET p.nome = ?, p.email = ? \r\n" + //
+                "WHERE c.id_cliente = ?;\r\n" + //
+                "";
+        jdbcTemplate.update(sql, nome, email, id_cliente);
+
+        String sql2 = "UPDATE cliente SET telefone = ?, telefone2 = ?, rua = ?, numero = ? WHERE id_cliente = ?";
+        jdbcTemplate.update(sql2, telefone, telefone2, rua, numero, id_cliente);
+
+        String sql3 = "SELECT p.nome from pessoa p join cliente c on c.cpf_pessoa_cliente = p.cpf where c.id_cliente = ?";
+        List<Map<String, Object>> resultNameProfile = jdbcTemplate.queryForList(sql3, id_cliente);
+        System.out.println(resultNameProfile);
+        model.addAttribute("resultNameProfile", resultNameProfile);
+        response.put("sucesso", "Informações atualizadas com sucesso.");
+        
+        return response;
+    }
+     
 }
