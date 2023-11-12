@@ -24,16 +24,39 @@
             </td>     
         </tr>
     </table>
-    <table th:if="${not #lists.isEmpty(resultadoReview)}">
+    <!-- <table th:if="${not #lists.isEmpty(resultadoReview)}">
         <tr>
             <th>NOME</th>
             <th>Review</th>
+            <th>Nota</th>
         </tr>
         <tr th:each="resultado: ${resultadoReview}">
             <td th:text="${resultado['nomeReview']}"></td>
             <td th:text="${resultado['descricaoReview']}"></td>
+            <td th:text="${resultado['nota']}"></td>
         </tr>
-    </table>
+    </table> -->
+
+    <div class="review-container">
+        <h2>Avaliações</h2>
+        <div class="review-box" th:each="resultado: ${resultadoReview}">
+            <div class="review-head">
+                <p class="review-name" th:text="${resultado['nomeReview']}"></p>
+                <p class="review-rate" th:utext="${#strings.repeat('&#9733;', resultado['nota'])}"></p>
+            </div>
+            <div class="review-description">
+                Descrição:
+                <p th:text="${resultado['descricaoReview']}"></p>
+            </div>
+            <span th:if="${resultado['Resposta'] != null}" id="resposta" onclick="openResponse(this)">Resposta</span>
+            <div th:if="${resultado['Resposta'] != null}" class="resposta-container">
+                <p th:text="${resultado['nomeFuncionario']} + ':'" class="func-name"></p>
+                <p th:text="${resultado['Resposta']}" class="func-response"></p>
+            </div>
+            
+        </div>
+    </div>
+    
     <div th:if="${#lists.isEmpty(resultadoReview)}">
         <p>Nenhum review disponível.</p>
     </div>
@@ -49,21 +72,21 @@
     </div>
     
 
-<div id="reviewModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Adicionar Review</h2>
-    <form id="reviewForm">
-      <label for="nota">Nota:</label>
-      <input type="number" id="nota" name="nota" min="1" max="5" required>
-      
-      <label for="descricao">Descrição:</label>
-      <textarea id="descricao" name="descricao"></textarea>
-      
-      <button type="submit">Adicionar Review</button>
-    </form>
-  </div>
-</div>
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Adicionar Review</h2>
+            <form id="reviewForm">
+                <label for="nota">Nota:</label>
+                <input type="number" id="nota" name="nota" min="1" max="5" required>
+                
+                <label for="descricao">Descrição:</label>
+                <textarea id="descricao" name="descricao"></textarea>
+                
+                <button type="submit">Adicionar Review</button>
+            </form>
+        </div>
+    </div>
 
 
     <script type="text/javascript">
@@ -87,7 +110,7 @@
             button.addEventListener('click', function() {
                 var userLogged = this.getAttribute('userLogged');
                 if(userLogged == 'true'){
-                    document.getElementById('reviewModal').style.display = 'block';
+                    document.getElementById('reviewModal').style.display = 'flex';
                 }
                 else{
                     window.location.href = '/login';
@@ -138,6 +161,13 @@
             document.getElementById('reviewModal').style.display = 'none';
             }
         });
+
+        function openResponse(element) {
+            var teste = element.parentNode.querySelector('.resposta-container');
+            teste.style.display = (teste.style.display === "block") ? "none" : "block";
+        }
+
+
     </script>
 </body>
 </html>

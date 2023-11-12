@@ -48,10 +48,14 @@ public class BdprojectController {
                 "from produto p \r\n" + //
                 "join categoria c on p.fk_id_categoria = c.id_categoria\r\n" + //
                 "where p.id_produto = ?";
-        String sql2 = "select p.nome as nomeReview, r.descricao as descricaoReview from cliente_faz_review_produto cfrp\r\n" + //
+        String sql2 = "select p.nome as nomeReview, r.descricao as descricaoReview, r.nota as nota, r.id_review as idReview,r2.resposta as Resposta,\r\n" + //
+                "p2.nome as nomeFuncionario from cliente_faz_review_produto cfrp\r\n" + //
                 "join cliente c on c.id_cliente = cfrp.fk_id_cliente  \r\n" + //
                 "join pessoa p on p.cpf = c.cpf_pessoa_cliente \r\n" + //
                 "join review r on cfrp.fk_id_review = r.id_review\r\n" + //
+                "left join responde r2 on r2.fk_id_review = r.id_review \r\n" + //
+                "left join funcionario f on r2.fk_id_funcionario = f.id_funcionario\r\n" + //
+                "left join pessoa p2 on f.cpf_pessoa  = p2.cpf\r\n" + //
                 "where cfrp.fk_id_produto = ?";
         List<Map<String, Object>> resultado = jdbcTemplate.queryForList(sql, id);
         List<Map<String, Object>> resultadoReview = jdbcTemplate.queryForList(sql2, id);
