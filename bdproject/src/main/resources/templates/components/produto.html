@@ -4,89 +4,157 @@
         <meta charset="UTF-8">
         <title>Detalhes do Produto</title>
         <link th:href="@{/styles/css/produto.css}" rel="stylesheet" />
+        <link th:href="@{/styles/css/home.css}" rel="stylesheet" />
+        <script th:src="@{/js/home.js}"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <div th:if="${!user.isFuncLogged}" th:include="~{components/home :: navbar-container}"></div>
+        <div th:if="${user.isFuncLogged}" th:include="~{components/home :: navbar-container-func}"></div>
+        <div th:if="${!user.isFuncLogged}" th:include="~{components/home :: cart-sidebar}"></div>
+
+
+
 </head>
 <body>
-    <h1>Detalhes do Produto</h1>
-    <table>
-        <tr>
-            <th>NOME</th>
-            <th>PRECO</th>
-            <th>DESCRICAO</th>
-            <th>CATEGORIA</th>
-        </tr>
-        <tr th:each="row : ${resultado}">
-            <td th:text="${row['nomeProduto']}"></td>
-            <td th:text="'$ ' + ${row['PrecoProduto']}"></td>
-            <td th:text="${row['DescricaoProduto']}"></td>
-            <td th:text="${row['NomeCategoria']}"></td>
-            <td>
-                <button th:attr="data-product-id=${row['idProduto']}" class="add-to-cart-button">Adicionar ao Carrinho</button>
-            </td>     
-        </tr>
-    </table>
-    <!-- <table th:if="${not #lists.isEmpty(resultadoReview)}">
-        <tr>
-            <th>NOME</th>
-            <th>Review</th>
-            <th>Nota</th>
-        </tr>
-        <tr th:each="resultado: ${resultadoReview}">
-            <td th:text="${resultado['nomeReview']}"></td>
-            <td th:text="${resultado['descricaoReview']}"></td>
-            <td th:text="${resultado['nota']}"></td>
-        </tr>
-    </table> -->
-
-    <div class="review-container">
-        <h2>Avaliações</h2>
-        <div class="review-box" th:each="resultado: ${resultadoReview}">
-            <div class="review-head">
-                <p class="review-name" th:text="${resultado['nomeReview']}"></p>
-                <p class="review-rate" th:utext="${#strings.repeat('&#9733;', resultado['nota'])}"></p>
-            </div>
-            <div class="review-description">
-                Descrição:
-                <p th:text="${resultado['descricaoReview']}"></p>
-            </div>
-            <span th:if="${resultado['Resposta'] != null}" id="resposta" onclick="openResponse(this)">Resposta</span>
-            <div th:if="${resultado['Resposta'] != null}" class="resposta-container">
-                <p th:text="${resultado['nomeFuncionario']} + ':'" class="func-name"></p>
-                <p th:text="${resultado['Resposta']}" class="func-response"></p>
-            </div>
-            
-        </div>
-    </div>
+    <section class="teste" th:if="${!user.isFuncLogged}">
+        <h1>Detalhes do Produto</h1>
+        <table>
+            <tr>
+                <th>NOME</th>
+                <th>PRECO</th>
+                <th>DESCRICAO</th>
+                <th>CATEGORIA</th>
+            </tr>
+            <tr th:each="row : ${resultado}">
+                <td th:text="${row['nomeProduto']}"></td>
+                <td th:text="'$ ' + ${row['PrecoProduto']}"></td>
+                <td th:text="${row['DescricaoProduto']}"></td>
+                <td th:text="${row['NomeCategoria']}"></td>
+                <td>
+                    <button th:attr="data-product-id=${row['idProduto']}" class="add-to-cart-button">Adicionar ao Carrinho</button>
+                </td>     
+            </tr>
+        </table>
+        <!-- <table th:if="${not #lists.isEmpty(resultadoReview)}">
+            <tr>
+                <th>NOME</th>
+                <th>Review</th>
+                <th>Nota</th>
+            </tr>
+            <tr th:each="resultado: ${resultadoReview}">
+                <td th:text="${resultado['nomeReview']}"></td>
+                <td th:text="${resultado['descricaoReview']}"></td>
+                <td th:text="${resultado['nota']}"></td>
+            </tr>
+        </table> -->
     
-    <div th:if="${#lists.isEmpty(resultadoReview)}">
-        <p>Nenhum review disponível.</p>
-    </div>
-
-    
-    <div th:if="${not #lists.isEmpty(resultNomeLogin)}">
-        <button id="addReviewButton" class="add-review-button" th:attr="data-id-produto-review=${resultado[0]['idProduto']}, data-id-cliente=${resultNomeLogin[0]['id_cliente']}, userLogged=${user.isLoggedIn}">Adicionar Review</button>
-
-    </div>
-    
-    <div th:if="${#lists.isEmpty(resultNomeLogin)}">
-        <button class="add-review-button" th:attr="userLogged=${user.isLoggedIn}">Adicionar Review</button>
-    </div>
-    
-
-    <div id="reviewModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Adicionar Review</h2>
-            <form id="reviewForm">
-                <label for="nota">Nota:</label>
-                <input type="number" id="nota" name="nota" min="1" max="5" required>
+        <div class="review-container">
+            <h2>Avaliações</h2>
+            <div class="review-box" th:each="resultado: ${resultadoReview}">
+                <div class="review-head">
+                    <p class="review-name" th:text="${resultado['nomeReview']}"></p>
+                    <p class="review-rate" th:utext="${#strings.repeat('&#9733;', resultado['nota'])}"></p>
+                </div>
+                <div class="review-description">
+                    Descrição:
+                    <p th:text="${resultado['descricaoReview']}"></p>
+                </div>
+                <span th:if="${resultado['Resposta'] != null}" id="resposta" onclick="openResponse(this)">Resposta</span>
+                <div th:if="${resultado['Resposta'] != null}" class="resposta-container">
+                    <p th:text="${resultado['nomeFuncionario']} + ':'" class="func-name"></p>
+                    <p th:text="${resultado['Resposta']}" class="func-response"></p>
+                </div>
                 
-                <label for="descricao">Descrição:</label>
-                <textarea id="descricao" name="descricao"></textarea>
-                
-                <button type="submit">Adicionar Review</button>
-            </form>
+            </div>
+            <div th:if="${#lists.isEmpty(resultadoReview)}">
+                <p>Nenhum review disponível.</p>
+            </div>
         </div>
-    </div>
+        
+    
+        
+        <div th:if="${not #lists.isEmpty(resultNomeLogin)}">
+            <button id="addReviewButton" class="add-review-button" th:attr="data-id-produto-review=${resultado[0]['idProduto']}, data-id-cliente=${resultNomeLogin[0]['id_cliente']}, userLogged=${user.isLoggedIn}">Adicionar Review</button>
+        </div>
+        
+        <div th:if="${#lists.isEmpty(resultNomeLogin)}">
+            <button class="add-review-button" th:attr="userLogged=${user.isLoggedIn}">Adicionar Review</button>
+        </div>
+        
+    
+        <div id="reviewModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Adicionar Review</h2>
+                <form id="reviewForm">
+                    <label for="nota">Nota:</label>
+                    <input type="number" id="nota" name="nota" min="1" max="5" required>
+                    
+                    <label for="descricao">Descrição:</label>
+                    <textarea id="descricao" name="descricao"></textarea>
+                    
+                    <button type="submit">Adicionar Review</button>
+                </form>
+            </div>
+        </div>
+    </section>
+    <section class="teste" th:if="${user.isFuncLogged}">
+        <h1>Detalhes do Produto</h1>
+        <table>
+            <tr>
+                <th>NOME</th>
+                <th>PRECO</th>
+                <th>DESCRICAO</th>
+                <th>CATEGORIA</th>
+            </tr>
+            <tr th:each="row : ${resultado}">
+                <td th:text="${row['nomeProduto']}"></td>
+                <td th:text="'$ ' + ${row['PrecoProduto']}"></td>
+                <td th:text="${row['DescricaoProduto']}"></td>
+                <td th:text="${row['NomeCategoria']}"></td>  
+            </tr>
+        </table>
+        <!-- <table th:if="${not #lists.isEmpty(resultadoReview)}">
+            <tr>
+                <th>NOME</th>
+                <th>Review</th>
+                <th>Nota</th>
+            </tr>
+            <tr th:each="resultado: ${resultadoReview}">
+                <td th:text="${resultado['nomeReview']}"></td>
+                <td th:text="${resultado['descricaoReview']}"></td>
+                <td th:text="${resultado['nota']}"></td>
+            </tr>
+        </table> -->
+    
+        <div class="review-container">
+            <h2>Avaliações</h2>
+            <div class="review-box" th:each="resultado: ${resultadoReview}" th:if="${resultado['Resposta'] == null}">
+                <div class="review-head">
+                    <p class="review-name" th:text="${resultado['nomeReview']}"></p>
+                    <p class="review-rate" th:utext="${#strings.repeat('&#9733;', resultado['nota'])}"></p>
+                </div>
+                <div class="review-description">
+                    Descrição:
+                    <p th:text="${resultado['descricaoReview']}"></p>
+                </div>
+                <span id="resposta" onclick="response(this)" th:attr="logged=${user.isFuncLogged}, data-id-review=${resultado['idReview']}, data-id-func=${resultFunc[0]['id_funcionario']}">Responder</span>
+            </div>
+        </div>
+        
+        
+        <div id="responseModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Adicionar Resposta</h2>
+                <form id="reviewForm">
+                    <label for="descricao">Descrição:</label>
+                    <textarea id="descricao" name="descricao" required></textarea>
+                    
+                    <button type="submit">Adicionar Resposta</button>
+                </form>
+            </div>
+        </div>
+    </section>
 
 
     <script type="text/javascript">
@@ -117,39 +185,65 @@
                 }
             });
         });
+        var id_review;
+        var id_func;
+        function response(element) {
+            var elementoClicado = event.target;
+            id_review = elementoClicado.dataset.idReview;
+            id_func = elementoClicado.dataset.idFunc;
+            console.log("Elemento Clicado:", elementoClicado);
+            console.log("ID do Review:", id_review);
+            console.log("ID do Funcionário:", id_func);
+
+            document.getElementById("responseModal").style.display = "flex";
+
+        }
         document.getElementById('reviewForm').addEventListener('submit', function (event) {
-        event.preventDefault();
-
-
-       var id_produto_review = document.getElementById('addReviewButton').getAttribute('data-id-produto-review');
-        var id_cliente = document.getElementById('addReviewButton').getAttribute('data-id-cliente');
-
-
-
-        
-        console.log("teste: " + id_produto_review);
-        console.log(id_cliente);
-
-        fetch('/makeReview', {
-            method: 'POST',
-            body: JSON.stringify({
-                nota: document.getElementById('nota').value,
-                descricao: document.getElementById('descricao').value,
-                id_produto_review: id_produto_review,
-                id_cliente: id_cliente
-            }),
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.sucesso);
-            document.getElementById('reviewModal').style.display = 'none';
-            location.reload();
-        });
-
-    });
+            event.preventDefault();
+                var id_produto_review = document.getElementById('addReviewButton').getAttribute('data-id-produto-review');
+                var id_cliente = document.getElementById('addReviewButton').getAttribute('data-id-cliente');
+                console.log("teste: " + id_produto_review);
+                console.log(id_cliente);
+    
+                fetch('/makeReview', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        nota: document.getElementById('nota').value,
+                        descricao: document.getElementById('descricao').value,
+                        id_produto_review: id_produto_review,
+                        id_cliente: id_cliente
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.sucesso);
+                    document.getElementById('reviewModal').style.display = 'none';
+                    location.reload();
+                });
+         });
+        document.getElementById('responseModal').addEventListener('submit', function (event) {
+            event.preventDefault();
+                fetch('/makeResponse', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        descricao: document.getElementById('descricao').value,
+                        id_review: id_review,
+                        id_func: id_func
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.sucesso);
+                    document.getElementById('responseModal').style.display = 'none';
+                    location.reload();
+                });
+         });
 
 
         document.querySelector('.close').addEventListener('click', function() {
@@ -166,8 +260,6 @@
             var teste = element.parentNode.querySelector('.resposta-container');
             teste.style.display = (teste.style.display === "block") ? "none" : "block";
         }
-
-
     </script>
 </body>
 </html>

@@ -4,177 +4,115 @@
     <meta charset="UTF-8">
     <title>Lista de produtos</title>
     <link th:href="@{/styles/css/home.css}" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script th:src="@{/js/home.js}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-    <nav class="navbar">
-        <div class="user-info">
-            <div class="user-name" th:if="${user.isLoggedIn}">
-                <p class="name" th:if="${not #lists.isEmpty(resultNomeLogin) and #lists.isEmpty(nomeProfile)}">
-                    Olá, <span th:text="${resultNomeLogin[0]['nome']}" id="resultNomeLogin" onclick="openUserOptions()"></span>
-                </p>
-                <p class="name" th:if="${not #lists.isEmpty(resultNomeLogin) and not #lists.isEmpty(nomeProfile)}">
-                    Olá, <span th:text="${nomeProfile[0]['nome']}" id="resultNomeLogin" onclick="openUserOptions()"></span>
-                </p>
-                <div id="userOptions">
-                    <a th:href="@{'/profile/' + ${resultNomeLogin[0]['id_cliente']}}">Ver meu perfil</a>
-                    <a href="/pedidos">Ver meus pedidos</a>
-                    <a th:href="@{/logout}" id="logout">Logout</a>
+    
+    <section th:if="${!user.isFuncLogged}">
+        <div th:fragment="navbar-container">
+            <nav class="navbar">
+                <div class="user-info">
+                    <div class="user-name" th:if="${user.isLoggedIn}">
+                        <p class="name" th:if="${not #lists.isEmpty(resultNomeLogin) and #lists.isEmpty(nomeProfile)}">
+                            Olá, <span th:text="${resultNomeLogin[0]['nome']}" id="resultNomeLogin" onclick="openUserOptions()"></span>
+                        </p>
+                        <p class="name" th:if="${not #lists.isEmpty(resultNomeLogin) and not #lists.isEmpty(nomeProfile)}">
+                            Olá, <span th:text="${nomeProfile[0]['nome']}" id="resultNomeLogin" onclick="openUserOptions()"></span>
+                        </p>
+                        <div id="userOptions">
+                            <a th:href="@{'/profile/' + ${resultNomeLogin[0]['id_cliente']}}">Ver meu perfil</a>
+                            <a href="/pedidos">Ver meus pedidos</a>
+                            <a th:href="@{/logout}" id="logout">Logout</a>
+                        </div>
+                    </div>  
+                    <a th:unless="${user.isLoggedIn}" th:href="@{/login}" id="login">Login</a>
                 </div>
-            </div>  
-            <a th:unless="${user.isLoggedIn}" th:href="@{/login}" id="login">Login</a>
+                <div id="cart-symbol" onclick="toggleCartSidebar()"><i class="fa fa-shopping-cart" style="font-size:25px;"></i></div>
+            </nav>
         </div>
-        <div id="cart-symbol" onclick="toggleCartSidebar()"><i class="fa fa-shopping-cart" style="font-size:25px;"></i></div>
-    </nav>
-    
-    
-    <h1>Lista de produtos</h1>
-    <table>
-        <tr>
-            <th>Produtos</th>
-        </tr>
-        <tr th:each="resultado : ${resultados}">
-            <td>
-                <a th:href="@{'/produto/' + ${resultado['id_produto']}}"><span th:text="${resultado['nome']}"></span></a>
-            </td>
-        </tr>
-    </table>
-    <!-- <div id="cart-symbol" onclick="toggleCartSidebar()">🛒</div> -->
-
-    <div id="cart-sidebar" class="cart-sidebar">
-        <h2>Carrinho de Compras</h2>
-        <ul id="cart-items"></ul>
-        <button id="limpar-carrinho">Limpar Carrinho</button>
-    </div>
-
-    
-    <script type="text/javascript">
-            function openUserOptions() {
-                var userOptions = document.getElementById("userOptions");
-                userOptions.style.display = "flex";
-        }
-        window.onclick = function (event) {
-            var userOptions = document.getElementById("userOptions");
-
-            if (userOptions) {
-                if (event.target !== userOptions && event.target !== document.getElementById("resultNomeLogin")) {
-                    console.log("Closing user options");
-                    userOptions.style.display = "none";
-                    console.log('Window clicked');
-                }
-            }
-
-            var cartSidebar = document.getElementById("cart-sidebar");
-            var cartSymbol = document.getElementById("cart-symbol");
-
-            if (
-                event.target !== cartSidebar &&
-                event.target !== cartSymbol &&
-                !cartSidebar.contains(event.target) &&
-                !cartSymbol.contains(event.target)
-            ) {
-                console.log('Closing cart sidebar');
-                cartSidebar.style.display = "none";
-            }
-        };
-
         
+        
+        <h1>Lista de produtos</h1>
+        <table>
+            <tr>
+                <th>Produtos</th>
+            </tr>
+            <tr th:each="resultado : ${resultados}">
+                <td>
+                    <a th:href="@{'/produto/' + ${resultado['id_produto']}}"><span th:text="${resultado['nome']}"></span></a>
+                </td>
+            </tr>
+        </table>
+        <!-- <div id="cart-symbol" onclick="toggleCartSidebar()">🛒</div> -->
+        <!-- <div th:fragment="cart-sidebar">
+            <div id="cart-sidebar" class="cart-sidebar">
+                <h2>Carrinho de Compras</h2>
+                <ul id="cart-items"></ul>
+                <button id="limpar-carrinho">Limpar Carrinho</button>
+                <p id="pedido" onclick="compra()">Realizar pedido</p>
+            </div>
+        </div> -->
+        <div th:fragment="cart-sidebar">
+            <div id="cart-sidebar" class="cart-sidebar">
+                <div id="cart-content" class="cart-content">
+                    <button type='button' class='cart-heading'>
+                        <i class="fa fa-thin fa-chevron-left"></i>
+                        <span class='heading'>Your Cart</span>
+                    </button>
+                    <div class='empty-cart'>
+                        <i class="fa-solid fa-bag-shopping" style="font-size: 80px;"></i>
+                        <h3>Your shopping bag is empty</h3>
+                        <button type='button' onclick="window.location.href='/'" class='btn'>Continue Shopping</button>
+                    </div>
+                    <div class="product-container">
+                        <!-- nao pode mexer aqui -->
+                    </div>   
+                    <div  class='cart-bottom'>
+                        <div class='total'>
+                          <h3>Subtotal:</h3>
+                          <h3></h3>
+                        </div>
+                        <div class='btn-container'>
+                          <button type='button' class='btn' onclick="compra()">Proceed to checkout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        function toggleCartSidebar() {
-            var cartSidebar = document.getElementById("cart-sidebar");
-            atualizarCarrinho();
-            cartSidebar.style.display = "flex";
-        }
-        // Function to update the cart
-        function atualizarCarrinho() {
-            fetch('/carrinho') 
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (data) {
-                    var cartItems = data.itens;
-                    var cartItemsList = document.getElementById('cart-items');
-                    
-                    cartItemsList.innerHTML = ''; // byh3ndr1ch
-                    cartItems.forEach(function (item) {
-                        var listItem = document.createElement('li');
-                        listItem.setAttribute('id', 'cart-item-' + item.id_produto); // Set the ID for the list item
-                        listItem.textContent = "Nome: " + item.nome + " - Preço: $" + item.preco + " - Quantidade: " + item.quantidade;
-                        var deleteButton = document.createElement('button');
-                        deleteButton.textContent = 'Delete';
-                        deleteButton.onclick = function() { deleteCartItem(item.id_produto); };
-                        listItem.appendChild(deleteButton);
-                    
-                        cartItemsList.appendChild(listItem);
-                    });
-                    
-                }); 
-        }
 
-        // Function to add a product to the cart
-        function adicionarAoCarrinho(productId) {
-            fetch('/carrinho/adicionar/' + productId, {
-                method: 'POST',
-                headers: {}
-            }).then(response => {
-                return response.json(); // Assuming your endpoint returns a JSON response
-            }).then(data => {
-                alert(data.message); // Alert the message from the server
-                window.location.href = '/'; // Redirect to the home page
-            }).catch(error => {
-                console.error('Error:', error);
-            });
-        }
+    <section th:if="${user.isFuncLogged}">
+        <div th:fragment="navbar-container-func">
+            <nav class="navbar">
+                <div class="user-info">
+                    <div class="user-name" th:if="${user.isFuncLogged}">
+                        <p class="name">
+                            Olá, <span th:text="${resultFunc[0]['nome']}" id="resultNomeLogin" onclick="openUserOptions()"></span>
+                        </p>
+                        <div id="userOptions">
+                            <a th:href="@{/logout}" id="logout">Logout</a>
+                        </div>
+                    </div> 
+                </div>
+            </nav>
+        </div>
+        
+        
+        <h1>Lista de produtos</h1>
+        <table>
+            <tr>
+                <th>Produtos</th>
+            </tr>
+            <tr th:each="resultado : ${resultados}">
+                <td>
+                    <a th:href="@{'/produto/' + ${resultado['id_produto']}}"><span th:text="${resultado['nome']}"></span></a>
+                </td>
+            </tr>
+        </table>
+    </section>
 
-        // Function to delete an item from the cart
-        function deleteCartItem(productId) {
-            fetch('/carrinho/remover/' + productId, {
-                method: 'POST',
-                headers: {
-                    // CSRF header if needed; it depends on your Spring Security configuration
-                    // 'X-CSRF-TOKEN': token
-                }
-            }).then(response => {
-                return response.json(); // Assuming your endpoint returns a JSON response
-            }).then(data => {
-                alert(data.message); // Alert the message from the server
-                var itemElement = document.getElementById('cart-item-' + productId);
-                if (itemElement) {
-                    itemElement.remove(); // This will remove the item from the DOM
-                }
-                atualizarCarrinho(); // Update the cart
-            }).catch(error => {
-                console.error('Error:', error);
-            });
-        }
 
-                
-        document.addEventListener('DOMContentLoaded', function () {
-            // Add to cart button listener
-            var addToCartButtons = document.querySelectorAll('.add-to-cart-button');
-            addToCartButtons.forEach(function(button) {
-                button.addEventListener('click', function () {
-                    var productId = this.getAttribute('data-product-id');
-                    adicionarAoCarrinho(productId);
-                });
-            });
-
-            // Clear cart button listener
-            var limparCarrinhoButton = document.getElementById('limpar-carrinho');
-            limparCarrinhoButton.addEventListener('click', function () {
-                fetch('/carrinho/limpar', { method: 'POST' })
-                    .then(function (response) {
-                        return response.json();
-                    })
-                    .then(function (data) {
-                        alert(data.message);
-                        atualizarCarrinho();
-                    });
-            });
-
-            // Initial cart update
-            atualizarCarrinho();
-        });
-    </script>
 </body>
 </html>

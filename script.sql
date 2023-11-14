@@ -8,17 +8,6 @@ CREATE TABLE Pessoa (
     constraint pk_pessoa primary key (cpf)
 );
 
-select * from pessoa p
-
-
-
-select * from cliente c 
-
-select * from funcionario f 
-
-delete from pessoa p where p.nome = 'Rafael Martins Falk'
-
-select p.nome from pessoa p where p.email = 'carlos@example.com' and p.senha = '12'
 
 ALTER TABLE Pessoa
 ADD CONSTRAINT email_Pessoa_ck CHECK (email LIKE '%@%.%');
@@ -105,6 +94,8 @@ constraint fk_id_produto_faz foreign key(fk_id_produto) references Produto(id_pr
 primary key(fk_id_review, fk_id_produto)
 );
 
+
+
 create table Responde(
 fk_id_funcionario int,
 fk_id_review int,
@@ -112,6 +103,9 @@ resposta varchar(500),
 constraint fk_id_funcionario_responde foreign key (fk_id_funcionario) references Funcionario(id_funcionario) on delete cascade,
 constraint fk_id_review_responde foreign key (fk_id_review) references Review(id_review) on delete cascade
 );
+
+ALTER TABLE Responde
+ADD CONSTRAINT pk_responde PRIMARY KEY (fk_id_review);
 
 
 create table fornecedor(
@@ -155,6 +149,9 @@ INSERT INTO Funcionario (cargo, id_gerente, cpf_pessoa) VALUES ('Atendente', 1, 
 INSERT INTO Cliente (telefone, telefone2, rua, numero, cpf_pessoa_cliente) VALUES ('111-222-3333', NULL, 'Rua C', 789, '111.222.333-44');
 INSERT INTO Cliente (telefone, telefone2, rua, numero, cpf_pessoa_cliente) VALUES ('555-666-7777', NULL, 'Rua D', 123, '555.666.777-88');
 
+
+
+
 -- Inserções na tabela Transportadora
 INSERT INTO Transportadora (id_transportadora, telefone, nome) VALUES (1, '555-123-4567', 'Transportadora A');
 INSERT INTO Transportadora (id_transportadora, telefone, nome) VALUES (2, '555-987-6543', 'Transportadora B');
@@ -168,6 +165,9 @@ INSERT INTO pedido (status, data_envio, data_chegada, data_prevista, fk_cliente_
 INSERT INTO review (descricao, nota) VALUES ('Ótimo produto!', 5.0);
 INSERT INTO review (descricao, nota) VALUES ('Bom serviço de entrega.', 4.0);
 
+
+SELECT LAST_INSERT_ID();
+
 -- Inserções na tabela Categoria
 INSERT INTO Categoria (id_categoria, nome) VALUES (1, 'Eletrônicos');
 INSERT INTO Categoria (id_categoria, nome) VALUES (2, 'Roupas');
@@ -178,13 +178,16 @@ INSERT INTO Produto (id_produto, nome, preco, descricao, fk_id_categoria) VALUES
 
 INSERT INTO Produto (id_produto, nome, preco, descricao, fk_id_categoria) VALUES (3, 'Laptop', 999.99, 'High-performance laptop', 1);
 
+
+
 -- Inserções na tabela cliente_faz_review_produto
 INSERT INTO cliente_faz_review_produto (fk_id_cliente, fk_id_review, fk_id_produto) VALUES (1, 1, 1);
 INSERT INTO cliente_faz_review_produto (fk_id_cliente, fk_id_review, fk_id_produto) VALUES (2, 2, 2);
 
+
 -- Inserções na tabela Responde
-INSERT INTO Responde (fk_id_funcionario, fk_id_review, resposta) VALUES (1, 1, 'Agradecemos pelo seu feedback!');
-INSERT INTO Responde (fk_id_funcionario, fk_id_review, resposta) VALUES (5, 2, 'Estamos trabalhando para melhorar nossas entregas.');
+INSERT INTO Responde (fk_id_funcionario, fk_id_review, resposta) VALUES (1, 13, 'Agradecemos pelo seu feedback!');
+INSERT INTO Responde (fk_id_funcionario, fk_id_review, resposta) VALUES (5, 8, 'Estamos trabalhando para melhorar nossas entregas.');
 
 -- Inserções na tabela fornecedor
 INSERT INTO fornecedor (id_fornecedor, nome, telefone) VALUES (1, 'Fornecedor A', '555-111-2222');
@@ -193,8 +196,10 @@ INSERT INTO fornecedor (id_fornecedor, nome, telefone) VALUES (2, 'Fornecedor B'
 -- Inserções na tabela Possui
 INSERT INTO Possui (fk_id_produto, fk_id_fornecedor) VALUES (1, 1);
 INSERT INTO Possui (fk_id_produto, fk_id_fornecedor) VALUES (2, 2);
+
 -- Inserções na tabela Contem
 INSERT INTO Contem (fk_id_produto, fk_id_pedido, quantidade) VALUES (1, 1, 2);
 INSERT INTO Contem (fk_id_produto, fk_id_pedido, quantidade) VALUES (2, 2, 3);
+
 
 

@@ -38,7 +38,6 @@
   }
   body {
     font-family: Arial, sans-serif;
-    margin: 20px;
 }
 
 h1 {
@@ -207,4 +206,7 @@ p{
 .func-response{
   font-size: 14px;
   margin-left: 10px;
+}
+.teste{
+  margin: 20px;
 }

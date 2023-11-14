@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @Controller
-@SessionAttributes(value = {"user", "resultNomeLogin", "CartItem","carrinho", "resultNomeUpdate","resultadoReview, ResultNomeGerente","resultProfileUpdate","nomeProfile"})
+@SessionAttributes(value = {"user", "resultNomeLogin", "CartItem","carrinho", "resultNomeUpdate","resultadoReview, ResultNomeGerente","resultProfileUpdate","nomeProfile","resultFunc"})
 public class BdprojectController {
 
     @Autowired
@@ -66,7 +66,7 @@ public class BdprojectController {
 
     @GetMapping("/login")
     public String showLoginPage(@ModelAttribute("user") CustomUser user) {
-        if (user.isLoggedIn()) {
+        if (user.isLoggedIn() || user.isFuncLogged()) {
             return "redirect:/";
         }
         return "components/login";
@@ -81,10 +81,20 @@ public class BdprojectController {
         List<Map<String, Object>> resultNomeLogin = jdbcTemplate.queryForList(sql, email, senha);
         model.addAttribute("resultNomeLogin", resultNomeLogin);
         
-        if (resultNomeLogin != null && !resultNomeLogin.isEmpty()) {
+        String sql2 = "select p.nome, f.id_funcionario from pessoa p join funcionario f on f.cpf_pessoa = p.cpf where p.email = ? and p.senha = ?";
+        List<Map<String, Object>> resultFunc = jdbcTemplate.queryForList(sql2, email, senha);
+        model.addAttribute("resultFunc", resultFunc);
+        
+        if (resultNomeLogin != null && !resultNomeLogin.isEmpty() && resultFunc.isEmpty()) {
             user.setLoggedIn(true);
+            user.setFuncLogged(false);
             response.put("loggedIn", true);
-        } else {
+        } else if(resultFunc != null && !resultFunc.isEmpty() && resultNomeLogin.isEmpty()){
+            user.setLoggedIn(false);
+            user.setFuncLogged(true);
+            response.put("loggedIn", true);
+        } 
+        else{
             response.put("loggedIn", false);
         }
         return response;
@@ -93,6 +103,7 @@ public class BdprojectController {
     @GetMapping("/logout")
     public String logout(@ModelAttribute("user") CustomUser user, @ModelAttribute("carrinho") Carrinho carrinho) {
         user.setLoggedIn(false);
+        user.setFuncLogged(false);
         carrinho.limparCarrinho();
         return "redirect:/";
     }
@@ -265,19 +276,42 @@ public class BdprojectController {
         
         return response;
     }
-        @GetMapping("/profile/{id}")
-    public String showUpdateProfile(@PathVariable("id") Long id_cliente, @ModelAttribute("user")  CustomUser user, Model model) {
+    @PostMapping("/makeResponse")
+    @ResponseBody
+    public Map<String, Object> makeResponse(@RequestBody Map<String, Object> reviewData) {
+        Map<String, Object> response = new HashMap<>();
 
-        // quero que o usuario veja os dados dele e tenha a opcao de modificar
-        if( user.isLoggedIn() == false){
-            return "redirect:/";
-        }
-        String sql = "select p.nome, p.email, c.telefone, c.telefone2, c.rua, c.numero, c.id_cliente from pessoa p join cliente c on c.cpf_pessoa_cliente = p.cpf where c.id_cliente = ?";
+        String id_review_string = (String) reviewData.get("id_review");
+        String descricao = (String) reviewData.get("descricao");
+        String id_func_string = (String) reviewData.get("id_func");
+
+        Long id_review = Long.parseLong(id_review_string);
+        Long id_func = Long.parseLong(id_func_string);
+
+        System.out.println(id_review);
+        System.out.println(descricao);
+
+        String sql = "INSERT INTO Responde (fk_id_funcionario, fk_id_review, resposta) VALUES (?, ?, ?);";
+        jdbcTemplate.update(sql, id_func, id_review, descricao);
+
+        response.put("sucesso", "Resposta feita com sucesso.");
         
-        List<Map<String, Object>> resultProfileUpdate = jdbcTemplate.queryForList(sql, id_cliente);
-        model.addAttribute("resultProfileUpdate", resultProfileUpdate);
-        return "components/profile";
+
+        return response;
     }
+        @GetMapping("/profile/{id}")
+        public String showUpdateProfile(@PathVariable("id") Long id_cliente, @ModelAttribute("user")  CustomUser user, Model model) {
+
+            // quero que o usuario veja os dados dele e tenha a opcao de modificar
+            if( user.isLoggedIn() == false){
+                return "redirect:/";
+            }
+            String sql = "select p.nome, p.email, c.telefone, c.telefone2, c.rua, c.numero, c.id_cliente from pessoa p join cliente c on c.cpf_pessoa_cliente = p.cpf where c.id_cliente = ?";
+            
+            List<Map<String, Object>> resultProfileUpdate = jdbcTemplate.queryForList(sql, id_cliente);
+            model.addAttribute("resultProfileUpdate", resultProfileUpdate);
+            return "components/profile";
+        }
     @PostMapping("/atualizarInformacoes")
     @ResponseBody
     public Map<String, Object> atualizarInformacoes(@RequestBody Map<String, Object> updateData , Model model) {
