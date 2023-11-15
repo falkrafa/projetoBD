@@ -21,8 +21,8 @@
                             Olá, <span th:text="${nomeProfile[0]['nome']}" id="resultNomeLogin" onclick="openUserOptions()"></span>
                         </p>
                         <div id="userOptions">
-                            <a th:href="@{'/profile/' + ${resultNomeLogin[0]['id_cliente']}}">Ver meu perfil</a>
-                            <a href="/pedidos">Ver meus pedidos</a>
+                            <a th:href="@{'/profile/' + ${resultNomeLogin[0]['id_cliente']}}">meu perfil</a>
+                            <a href="/pedidos">meus pedidos</a>
                             <a th:href="@{/logout}" id="logout">Logout</a>
                         </div>
                     </div>  
@@ -33,7 +33,7 @@
         </div>
         
         
-        <h1>Lista de produtos</h1>
+        <!-- <h1>Lista de produtos</h1>
         <table>
             <tr>
                 <th>Produtos</th>
@@ -41,12 +41,29 @@
             <tr th:each="resultado : ${resultados}">
                 <td>
                     <a th:href="@{'/produto/' + ${resultado['id_produto']}}"><span th:text="${resultado['nome']}"></span></a>
-                    <!-- <img th:src="@{${resultado['image']}}" alt="" srcset="">
+                    <img th:src="@{${resultado['image']}}" alt="" srcset="">
                     <img th:src="@{${resultado['image2']}}" alt="" srcset="">
-                    <img th:src="@{${resultado['image3']}}" alt="" srcset=""> -->
+                    <img th:src="@{${resultado['image3']}}" alt="" srcset="">
                 </td>
             </tr>
-        </table>
+        </table> -->
+        <div class='products-section'>
+            <div class='products-heading'>
+                <h1>Produtos</h1>
+            </div>
+            <div class='products-section'>
+                <div class='products-container'>
+                    <div th:each="resultado : ${resultados}" th:data-href="@{/produto/__${resultado['id_produto']}__}" onclick="window.location.href=this.getAttribute('data-href');">
+                        <div class="product-card">
+                            <img th:src="@{${resultado['image']}}" class='product-image'></img>
+                            <p class='product-name' th:text="${resultado['nome']}"></p>
+                            <p class='product-price' th:text="${resultado['preco']}"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- <div id="cart-symbol" onclick="toggleCartSidebar()">🛒</div> -->
         <!-- <div th:fragment="cart-sidebar">
             <div id="cart-sidebar" class="cart-sidebar">
@@ -85,7 +102,7 @@
                                     th:text="${transportadora['nome']}" required></option>
                         </select>
                         <div class='btn-container' th:if="${user.isLoggedIn}">
-                            <button type='button' class='btn' th:onclick="'compra(\'' + ${resultNomeLogin[0]['id_cliente']} + '\')'" id="enviar">Proceed to checkout</button>
+                            <button type='button' class='btn' th:onclick="'compra(\'' + ${resultNomeLogin[0]['id_cliente']} + '\')'" id="enviar">Place Order</button>
                         </div>
                         <div class='btn-container' th:if="${!user.isLoggedIn}">
                           <button type='button' class='btn' onclick="window.location.href='/login'">Proceed to checkout</button>

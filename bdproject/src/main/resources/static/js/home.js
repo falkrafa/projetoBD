@@ -88,11 +88,10 @@ function atualizarCarrinho() {
             productContainer.innerHTML = '';
 
             if (currentCartItems.length === 0) {
-                // Show the empty cart section
-                emptyCartSection.style.display = 'block';
                 cartBottom.style.display = 'none';
+                emptyCartSection.style.display = 'block';
             } else {
-                // Hide the empty cart section
+                
                 emptyCartSection.style.display = 'none';
 
                 // Populate the cart items
@@ -231,37 +230,24 @@ function atualizarCarrinho() {
             var gifContainer = document.getElementById("gif-container");
             var bottom = document.getElementById("cart-bottom");
             var cartContainer = document.getElementById("cart-content");
-        
-            // Salvar o estilo atual para que ele possa ser restaurado posteriormente
             var estiloOriginal = cartContainer.style.cssText;
         
-            // Remover o padding do cart-container
-            cartContainer.style.padding = "0";
-        
-            gifContainer.innerHTML = "<img src='https://cdn.dribbble.com/users/330174/screenshots/2695600/comp_2.gif' alt='gif'>";
             bottom.style.display = "none";
-            gifContainer.style.display = "flex"; // Mostra o gif
+            cartContainer.style.padding = "0";
+            gifContainer.style.display = "flex";
+            gifContainer.innerHTML = "<img src='/images/ezgif.com-gif-maker.gif' alt='gif'>";
+            // Salvar o estilo atual para que ele possa ser restaurado posteriormente
+        
+            // Remover o padding do cart-container
+        
         
             setTimeout(function() {
                 cartContainer.style.cssText = estiloOriginal;
                 gifContainer.style.display = "none";
                 atualizarCarrinho(); 
-            }, 5000); // 6000 milissegundos = 6 segundos (ajuste conforme necessário)
+            }, 5000); 
         }
         
-        function gifLoaded() {
-            var gifContainer = document.getElementById("gif-container");
-        
-            // Defina um temporizador para ocultar o gif após 3 segundos (ajuste conforme necessário)
-            setTimeout(function() {
-                gifContainer.style.display = "none"; // Oculta o gif
-            }, 3000); // 3000 milissegundos = 3 segundos
-        }
-        
-        
-        
-
-                
         document.addEventListener('DOMContentLoaded', function () {
             
 

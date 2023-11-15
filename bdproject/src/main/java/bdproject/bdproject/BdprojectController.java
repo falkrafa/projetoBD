@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @Controller
-@SessionAttributes(value = {"user", "resultNomeLogin", "CartItem","carrinho", "resultNomeUpdate","resultadoReview, ResultNomeGerente","resultProfileUpdate","nomeProfile","resultFunc","resultadoTransportadora"})
+@SessionAttributes(value = {"user", "resultados","resultNomeLogin", "CartItem","carrinho", "resultNomeUpdate","resultadoReview, ResultNomeGerente","resultProfileUpdate","nomeProfile","resultFunc","resultadoTransportadora"})
 public class BdprojectController {
 
     @Autowired
@@ -52,7 +52,7 @@ public class BdprojectController {
                 "join categoria c on p.fk_id_categoria = c.id_categoria\r\n" + //
                 "where p.id_produto = ?";
         String sql2 = "select p.nome as nomeReview, r.descricao as descricaoReview, r.nota as nota, r.id_review as idReview,r2.resposta as Resposta,\r\n" + //
-                "p2.nome as nomeFuncionario from cliente_faz_review_produto cfrp\r\n" + //
+                "p2.nome as nomeFuncionario, cfrp.fk_id_cliente as idCliente from cliente_faz_review_produto cfrp\r\n" + //
                 "join cliente c on c.id_cliente = cfrp.fk_id_cliente  \r\n" + //
                 "join pessoa p on p.cpf = c.cpf_pessoa_cliente \r\n" + //
                 "join review r on cfrp.fk_id_review = r.id_review\r\n" + //
@@ -400,4 +400,18 @@ public class BdprojectController {
             throw new IllegalArgumentException("O objeto não é uma lista de itens");
         }
     }
+
+    @PostMapping("deleteReview/{id}")
+    @ResponseBody
+    public Map<String, Object> removerComment(@PathVariable Long id) {
+        Map<String, Object> response = new HashMap<>();
+        System.out.println(id);
+
+        String sql = "DELETE FROM review WHERE id_review = ?";
+        jdbcTemplate.update(sql, id);
+        response.put("message", "Review removida com sucesso.");
+        return response;
+    }
+    
+    
 }

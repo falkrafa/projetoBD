@@ -47,7 +47,33 @@
             </tr>
         </table> -->
     
-        <div class="review-container">
+        <div class="review-container" th:if="${not #lists.isEmpty(resultNomeLogin) }">
+            <h2>Avaliações</h2>
+            <div class="review-box" th:each="resultado: ${resultadoReview}">
+                <div class="review-head">
+                    <p class="review-name" th:text="${resultado['nomeReview']}"></p>
+                    <p class="review-rate" th:utext="${#strings.repeat('&#9733;', resultado['nota'])}"></p>
+                </div>
+                <div class="review-description">
+                    Descrição:
+                    <p th:text="${resultado['descricaoReview']}"></p>
+                </div>
+                <button type="button" th:if="${resultNomeLogin[0]['id_cliente'] eq resultado['idCliente']}" 
+                    id="cliente_id" 
+                    onclick="teste(this)" 
+                    th:attr="id_review_cliente=${resultado['idCliente']}, id_review=${resultado['idReview']}">Apagar comentario</button>
+              
+                <span th:if="${resultado['Resposta'] != null}" id="resposta" onclick="openResponse(this)">Resposta</span>
+                <div th:if="${resultado['Resposta'] != null}" class="resposta-container">
+                    <p th:text="${resultado['nomeFuncionario']} + ':'" class="func-name"></p>
+                    <p th:text="${resultado['Resposta']}" class="func-response"></p>
+                </div>        
+            </div>
+            <div th:if="${#lists.isEmpty(resultadoReview)}">
+                <p>Nenhum review disponível.</p>
+            </div>
+        </div>
+        <div class="review-container" th:if="${#lists.isEmpty(resultNomeLogin)}">
             <h2>Avaliações</h2>
             <div class="review-box" th:each="resultado: ${resultadoReview}">
                 <div class="review-head">
@@ -62,8 +88,7 @@
                 <div th:if="${resultado['Resposta'] != null}" class="resposta-container">
                     <p th:text="${resultado['nomeFuncionario']} + ':'" class="func-name"></p>
                     <p th:text="${resultado['Resposta']}" class="func-response"></p>
-                </div>
-                
+                </div>        
             </div>
             <div th:if="${#lists.isEmpty(resultadoReview)}">
                 <p>Nenhum review disponível.</p>
@@ -259,6 +284,27 @@
         function openResponse(element) {
             var teste = element.parentNode.querySelector('.resposta-container');
             teste.style.display = (teste.style.display === "block") ? "none" : "block";
+        }
+
+        function teste(element) {
+            var cliente_id = element.parentNode.querySelector('#cliente_id').getAttribute('id_review_cliente');
+            var id_review = element.parentNode.querySelector('#cliente_id').getAttribute('id_review');
+            
+            console.log(id_review);
+            fetch('/deleteReview/' + id_review, {
+                method: 'POST',
+                body: JSON.stringify({
+                    id_review: id_review
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            });
         }
     </script>
 </body>
