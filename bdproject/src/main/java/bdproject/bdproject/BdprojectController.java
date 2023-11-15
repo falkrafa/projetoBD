@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @Controller
-@SessionAttributes(value = {"user", "resultNomeLogin", "CartItem","carrinho", "resultNomeUpdate","resultadoReview, ResultNomeGerente","resultProfileUpdate","nomeProfile","resultFunc"})
+@SessionAttributes(value = {"user", "resultNomeLogin", "CartItem","carrinho", "resultNomeUpdate","resultadoReview, ResultNomeGerente","resultProfileUpdate","nomeProfile","resultFunc","resultadoTransportadora"})
 public class BdprojectController {
 
     @Autowired
@@ -38,6 +38,9 @@ public class BdprojectController {
     public String home(Model model, @ModelAttribute("user") CustomUser user) {
         List<Map<String, Object>> resultados = jdbcTemplate.queryForList("SELECT * FROM produto");
         model.addAttribute("resultados", resultados);
+
+        List<Map<String, Object>> resultadoTransportadora = jdbcTemplate.queryForList("SELECT * FROM transportadora");
+        model.addAttribute("resultadoTransportadora", resultadoTransportadora );
         model.addAttribute("user", user);
         return "components/home";
     }
@@ -346,5 +349,55 @@ public class BdprojectController {
         
         return response;
     }
-     
+
+    @PostMapping("/insertPedido")
+    @ResponseBody
+    public Map<String, Object> insertPedido(@RequestBody Map<String, Object> pedidoData, Carrinho carrinho) {
+        Map<String, Object> response = new HashMap<>();
+
+        System.out.println("entrei");
+        String id_clienteString = (String) pedidoData.get("id_cliente");
+        String id_transportadoraString = (String) pedidoData.get("id_transportadora");
+
+        Long id_cliente = Long.parseLong(id_clienteString);
+        Long id_transportadora = Long.parseLong(id_transportadoraString);
+        System.out.println(id_cliente);
+        System.out.println(id_transportadora);
+        String sql = "INSERT INTO pedido (status, data_compra, data_prevista, fk_cliente_id, fk_id_transportadora)\r\n" + //
+        "VALUES (\r\n" + //
+        "    'Em processamento',\r\n" + //
+        "    CURRENT_DATE,\r\n" + //
+        "    DATE_ADD(CURRENT_DATE, INTERVAL 10 DAY),\r\n" + //
+        "    ?,\r\n" + //
+        "    ?\r\n" + //
+        ");";
+
+        jdbcTemplate.update(sql, id_cliente, id_transportadora);
+        Long pedidoId = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID();", Long.class);
+        
+        List<Map<String, Object>> items = castToItemsList(pedidoData.get("itens")); 
+        for (Map<String, Object> item : items) {
+            String id_produtoItemString = String.valueOf(item.get("id")); 
+            String quantidade_String = String.valueOf(item.get("quantidade"));
+
+            Long id_produtoItem = Long.parseLong(id_produtoItemString);
+            Long quantidade = Long.parseLong(quantidade_String);
+
+            String sql2 = "INSERT INTO contem (fk_id_produto, fk_id_pedido, quantidade) VALUES (?, ?, ?);";
+            jdbcTemplate.update(sql2, id_produtoItem, pedidoId, quantidade);
+        }
+        carrinho.limparCarrinho();
+        response.put("sucesso", "Pedido feito com sucesso.");
+        
+        return response;
+    }
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> castToItemsList(Object items) {
+        if (items instanceof List<?>) {
+            return (List<Map<String, Object>>) items;
+        } else {
+            // Lida com o caso em que o objeto não é uma lista
+            throw new IllegalArgumentException("O objeto não é uma lista de itens");
+        }
+    }
 }

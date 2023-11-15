@@ -17,12 +17,20 @@
             var cartSidebar = document.getElementById("cart-content");
             var cartSymbol = document.getElementById("cart-symbol");
             var cartWrapper = document.getElementById("cart-sidebar");
+            var cartClose = document.getElementById("cartHeading");
 
             if (
                 event.target !== cartSidebar &&
                 event.target !== cartSymbol &&
                 !cartSidebar.contains(event.target) &&
                 !cartSymbol.contains(event.target)
+            ) {
+                console.log('Closing cart sidebar');
+                cartWrapper.style.display = "none";
+            }
+            else if (
+                event.target == cartClose &&
+                cartClose.contains(event.target)
             ) {
                 console.log('Closing cart sidebar');
                 cartWrapper.style.display = "none";
@@ -160,9 +168,98 @@ function atualizarCarrinho() {
                 console.error('Error:', error);
             });
         }
-        function compra() {
-            console.log(currentCartItems);
+        function compra(id_cliente) {
+            var selectedShipping = document.getElementById("shipping").value;
+            var itemsArray = [];
+        
+            if (selectedShipping) {
+                // Array para armazenar os itens
+        
+                // Iterar através de currentCartItems e adicionar informações necessárias ao array de itens
+                for (var i = 0; i < currentCartItems.length; i++) {
+                    var currentItem = currentCartItems[i];
+        
+                    // Adicionar informações relevantes ao array de itens
+                    var itemData = {
+                        "id": currentItem.id,
+                        "quantidade": currentItem.quantidade,
+                    };
+        
+                    // Adicionar o objeto itemData ao array de itens
+                    itemsArray.push(itemData);
+                }
+        
+                console.log(itemsArray);
+        
+                // Criar objeto pedidoData com todas as informações necessárias
+                var pedidoData = {
+                    "id_cliente": id_cliente,
+                    "id_transportadora": selectedShipping,
+                    "itens": itemsArray, // Adicionar o array de itens ao objeto pedidoData
+                };
+        
+                console.log(pedidoData);
+        
+                // Enviar dados para o servidor usando fetch
+                fetch('/insertPedido', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(pedidoData),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.sucesso) {
+                        currentCartItems = [];
+                        itemsArray = [];
+                        showGifInCart();
+                        document.getElementById("shipping").value = "";
+                        console.log('Success:', data);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        
+            } else {
+                console.error("Please choose a shipping company before proceeding to checkout.");
+            }
         }
+        
+        function showGifInCart() {
+            var gifContainer = document.getElementById("gif-container");
+            var bottom = document.getElementById("cart-bottom");
+            var cartContainer = document.getElementById("cart-content");
+        
+            // Salvar o estilo atual para que ele possa ser restaurado posteriormente
+            var estiloOriginal = cartContainer.style.cssText;
+        
+            // Remover o padding do cart-container
+            cartContainer.style.padding = "0";
+        
+            gifContainer.innerHTML = "<img src='https://cdn.dribbble.com/users/330174/screenshots/2695600/comp_2.gif' alt='gif'>";
+            bottom.style.display = "none";
+            gifContainer.style.display = "flex"; // Mostra o gif
+        
+            setTimeout(function() {
+                cartContainer.style.cssText = estiloOriginal;
+                gifContainer.style.display = "none";
+                atualizarCarrinho(); 
+            }, 5000); // 6000 milissegundos = 6 segundos (ajuste conforme necessário)
+        }
+        
+        function gifLoaded() {
+            var gifContainer = document.getElementById("gif-container");
+        
+            // Defina um temporizador para ocultar o gif após 3 segundos (ajuste conforme necessário)
+            setTimeout(function() {
+                gifContainer.style.display = "none"; // Oculta o gif
+            }, 3000); // 3000 milissegundos = 3 segundos
+        }
+        
+        
+        
 
                 
         document.addEventListener('DOMContentLoaded', function () {

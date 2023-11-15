@@ -41,6 +41,9 @@
             <tr th:each="resultado : ${resultados}">
                 <td>
                     <a th:href="@{'/produto/' + ${resultado['id_produto']}}"><span th:text="${resultado['nome']}"></span></a>
+                    <!-- <img th:src="@{${resultado['image']}}" alt="" srcset="">
+                    <img th:src="@{${resultado['image2']}}" alt="" srcset="">
+                    <img th:src="@{${resultado['image3']}}" alt="" srcset=""> -->
                 </td>
             </tr>
         </table>
@@ -56,7 +59,8 @@
         <div th:fragment="cart-sidebar">
             <div id="cart-sidebar" class="cart-sidebar">
                 <div id="cart-content" class="cart-content">
-                    <button type='button' class='cart-heading'>
+                    <div id="gif-container" style="display: none;"></div>
+                    <button type='button' class='cart-heading' id="cartHeading">
                         <i class="fa fa-thin fa-chevron-left"></i>
                         <span class='heading'>Your Cart</span>
                     </button>
@@ -68,13 +72,23 @@
                     <div class="product-container">
                         <!-- nao pode mexer aqui -->
                     </div>   
-                    <div  class='cart-bottom'>
+                    <div  id="cart-bottom" class='cart-bottom'>
                         <div class='total'>
                           <h3>Subtotal:</h3>
                           <h3></h3>
                         </div>
-                        <div class='btn-container'>
-                          <button type='button' class='btn' onclick="compra()">Proceed to checkout</button>
+                        <select id="shipping" name="shipping">
+                            <option value="">Choose a shipping company</option>
+                    
+                            <option th:each="transportadora: ${resultadoTransportadora}" 
+                                    th:value="${transportadora['id_transportadora']}" 
+                                    th:text="${transportadora['nome']}" required></option>
+                        </select>
+                        <div class='btn-container' th:if="${user.isLoggedIn}">
+                            <button type='button' class='btn' th:onclick="'compra(\'' + ${resultNomeLogin[0]['id_cliente']} + '\')'" id="enviar">Proceed to checkout</button>
+                        </div>
+                        <div class='btn-container' th:if="${!user.isLoggedIn}">
+                          <button type='button' class='btn' onclick="window.location.href='/login'">Proceed to checkout</button>
                         </div>
                     </div>
                 </div>
