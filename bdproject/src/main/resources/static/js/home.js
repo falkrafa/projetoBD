@@ -91,10 +91,9 @@ function atualizarCarrinho() {
                 cartBottom.style.display = 'none';
                 emptyCartSection.style.display = 'block';
             } else {
-                
                 emptyCartSection.style.display = 'none';
 
-                // Populate the cart items
+                
                 currentCartItems.forEach(function (item) {
                     var productDiv = document.createElement('div');
                     productDiv.classList.add('product');

@@ -210,3 +210,16 @@ p{
 .teste{
   margin: 20px;
 }
+.delete_review{
+  cursor: pointer;
+  color: red;
+}
+.delete_review :hover{
+  color: darkred;
+}
+.review-top{
+  width: 95%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

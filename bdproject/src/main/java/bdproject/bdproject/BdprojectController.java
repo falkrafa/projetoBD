@@ -413,5 +413,12 @@ public class BdprojectController {
         return response;
     }
     
-    
+    @GetMapping("/meusPedidos")
+    public String showMeusPedidos(@ModelAttribute("user") CustomUser user, Model model) {
+        if( user.isLoggedIn() == false){
+            return "redirect:/";
+        }
+
+        return "components/pedidos";
+    }    
 }

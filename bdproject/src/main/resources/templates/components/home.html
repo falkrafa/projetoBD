@@ -9,7 +9,7 @@
 </head>
 <body>
     
-    <section th:if="${!user.isFuncLogged}">
+    <section th:if="${!user.isFuncLogged}" class="section">
         <div th:fragment="navbar-container">
             <nav class="navbar">
                 <div class="user-info">
@@ -22,7 +22,7 @@
                         </p>
                         <div id="userOptions">
                             <a th:href="@{'/profile/' + ${resultNomeLogin[0]['id_cliente']}}">meu perfil</a>
-                            <a href="/pedidos">meus pedidos</a>
+                            <a href="/meusPedidos">meus pedidos</a>
                             <a th:href="@{/logout}" id="logout">Logout</a>
                         </div>
                     </div>  

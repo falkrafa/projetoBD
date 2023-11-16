@@ -51,17 +51,19 @@
             <h2>Avaliações</h2>
             <div class="review-box" th:each="resultado: ${resultadoReview}">
                 <div class="review-head">
-                    <p class="review-name" th:text="${resultado['nomeReview']}"></p>
+                    <div class="review-top">
+                        <p class="review-name" th:text="${resultado['nomeReview']}"></p>
+                        <span th:if="${resultNomeLogin[0]['id_cliente'] eq resultado['idCliente']}" 
+                            id="cliente_id" 
+                            onclick="teste(this)" 
+                            th:attr="id_review_cliente=${resultado['idCliente']}, id_review=${resultado['idReview']}" class="delete_review"><i class=" fa fa-solid fa-trash"></i></span>
+                    </div>
                     <p class="review-rate" th:utext="${#strings.repeat('&#9733;', resultado['nota'])}"></p>
                 </div>
                 <div class="review-description">
                     Descrição:
                     <p th:text="${resultado['descricaoReview']}"></p>
                 </div>
-                <button type="button" th:if="${resultNomeLogin[0]['id_cliente'] eq resultado['idCliente']}" 
-                    id="cliente_id" 
-                    onclick="teste(this)" 
-                    th:attr="id_review_cliente=${resultado['idCliente']}, id_review=${resultado['idReview']}">Apagar comentario</button>
               
                 <span th:if="${resultado['Resposta'] != null}" id="resposta" onclick="openResponse(this)">Resposta</span>
                 <div th:if="${resultado['Resposta'] != null}" class="resposta-container">
@@ -108,7 +110,7 @@
     
         <div id="reviewModal" class="modal">
             <div class="modal-content">
-                <span class="close">&times;</span>
+                <span class="close" onclick="closeModal()">&times;</span>
                 <h2>Adicionar Review</h2>
                 <form id="reviewForm">
                     <label for="nota">Nota:</label>
@@ -274,6 +276,10 @@
         document.querySelector('.close').addEventListener('click', function() {
             document.getElementById('reviewModal').style.display = 'none';
         });
+
+        function closeModal() {
+            document.getElementById('reviewModal').style.display = 'none';
+        }
 
         window.addEventListener('click', function(event) {
             if (event.target === document.getElementById('reviewModal')) {
