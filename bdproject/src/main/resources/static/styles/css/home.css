@@ -123,20 +123,24 @@
     transform: scale(1.1,1.1);
   }
   .product-container{
+    position: fixed;
+    overflow-y: scroll;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 20px;
-    width: 80%;
+    width: 100%;
+    max-height: 70%;
     scroll-snap-align: start;
   }
   .product-container a {
     text-decoration: none;
   }
   .product{
+    width: 100%;
     display: flex;
-   gap: 30px;
+    gap: 30px;
     padding: 20px;
   }
   .item-desc .flex{
@@ -242,4 +246,10 @@
     font-weight: 600;
     margin-top: 6px;
     color: black;
+  }
+  .product .cart-product-image{
+    width:180px ;
+    height: 150px;
+      border-radius: 15px;
+   background-color: #ebebeb;
   }

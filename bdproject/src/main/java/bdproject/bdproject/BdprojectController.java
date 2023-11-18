@@ -87,7 +87,7 @@ public class BdprojectController {
         String sql2 = "select p.nome, f.id_funcionario from pessoa p join funcionario f on f.cpf_pessoa = p.cpf where p.email = ? and p.senha = ?";
         List<Map<String, Object>> resultFunc = jdbcTemplate.queryForList(sql2, email, senha);
         model.addAttribute("resultFunc", resultFunc);
-        
+        System.out.println(resultNomeLogin);
         if (resultNomeLogin != null && !resultNomeLogin.isEmpty() && resultFunc.isEmpty()) {
             user.setLoggedIn(true);
             user.setFuncLogged(false);

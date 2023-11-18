@@ -76,7 +76,7 @@ function atualizarCarrinho() {
         .then(function (data) {
             var cartItems = data.itens;
             currentCartItems = cartItems.map(function (item) {
-                return { id: item.id_produto, quantidade: item.quantidade, nome: item.nome, preco: item.preco };
+                return { id: item.id_produto, quantidade: item.quantidade, nome: item.nome, preco: item.preco, image: item.image };
             });
 
             var cartContent = document.getElementById('cart-content');
@@ -84,7 +84,6 @@ function atualizarCarrinho() {
             var productContainer = document.querySelector('.product-container');
             var cartBottom = document.querySelector('.cart-bottom');
 
-            // Clear existing items in the cart
             productContainer.innerHTML = '';
 
             if (currentCartItems.length === 0) {
@@ -105,7 +104,7 @@ function atualizarCarrinho() {
                     flexDiv.classList.add('flex', 'top');
 
                     var flexBot = document.createElement('div');
-                    flexBot.classList.add('flex', 'bottom');  // Aqui corrigido para 'flexBot'
+                    flexBot.classList.add('flex', 'bottom');
 
                     var nomeH5 = document.createElement('h5');
                     nomeH5.textContent = item.nome;
@@ -114,20 +113,28 @@ function atualizarCarrinho() {
                     precoH4.textContent = "R$" + item.preco;
 
                     var deleteButton = document.createElement('button');
-                    deleteButton.textContent = 'Delete';
+                    deleteButton.innerHTML = '<i class="fa fa-solid fa-trash"></i>';
                     deleteButton.onclick = function () { deleteCartItem(item.id); };
-                     // Assuming item.id is the unique identifier
+                    deleteButton.classList.add('delete_review');
+
                     var quantidade = document.createElement('h4');
                     quantidade.textContent = 'Quantidade: ' + item.quantidade;
+
+                    var imagem = document.createElement('img');
+                    imagem.src = item.image;
+                    imagem.alt = 'Imagem do produto';
+                    imagem.classList.add('cart-product-image');
+
 
                     flexDiv.appendChild(nomeH5);
                     flexDiv.appendChild(precoH4);
 
-                    flexBot.appendChild(deleteButton);  // Adicionado o botão de delete ao flexBot
-                    flexBot.appendChild(quantidade);  // Adicionado o botão de delete ao flexBot
+                    flexBot.appendChild(deleteButton);
+                    flexBot.appendChild(quantidade);
 
                     itemDescDiv.appendChild(flexDiv);
-                    itemDescDiv.appendChild(flexBot);  // Adicionado flexBot ao itemDescDiv
+                    itemDescDiv.appendChild(flexBot); 
+                    productDiv.appendChild(imagem); 
                     productDiv.appendChild(itemDescDiv);
                     productContainer.appendChild(productDiv);
                     cartBottom.style.display = 'block';
