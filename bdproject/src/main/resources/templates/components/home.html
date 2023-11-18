@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Lista de produtos</title>
     <link th:href="@{/styles/css/home.css}" rel="stylesheet" />
+    <link th:href="@{/styles/css/produto.css}" rel="stylesheet" />
     <script th:src="@{/js/home.js}"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
@@ -31,22 +32,6 @@
                 <div id="cart-symbol" onclick="toggleCartSidebar()"><i class="fa fa-shopping-cart" style="font-size:25px;"></i></div>
             </nav>
         </div>
-        
-        
-        <!-- <h1>Lista de produtos</h1>
-        <table>
-            <tr>
-                <th>Produtos</th>
-            </tr>
-            <tr th:each="resultado : ${resultados}">
-                <td>
-                    <a th:href="@{'/produto/' + ${resultado['id_produto']}}"><span th:text="${resultado['nome']}"></span></a>
-                    <img th:src="@{${resultado['image']}}" alt="" srcset="">
-                    <img th:src="@{${resultado['image2']}}" alt="" srcset="">
-                    <img th:src="@{${resultado['image3']}}" alt="" srcset="">
-                </td>
-            </tr>
-        </table> -->
         <div class='products-section'>
             <div class='products-heading'>
                 <h1>Produtos</h1>
@@ -63,16 +48,7 @@
                 </div>
             </div>
         </div>
-        
-        <!-- <div id="cart-symbol" onclick="toggleCartSidebar()">🛒</div> -->
-        <!-- <div th:fragment="cart-sidebar">
-            <div id="cart-sidebar" class="cart-sidebar">
-                <h2>Carrinho de Compras</h2>
-                <ul id="cart-items"></ul>
-                <button id="limpar-carrinho">Limpar Carrinho</button>
-                <p id="pedido" onclick="compra()">Realizar pedido</p>
-            </div>
-        </div> -->
+
         <div th:fragment="cart-sidebar">
             <div id="cart-sidebar" class="cart-sidebar">
                 <div id="cart-content" class="cart-content">
@@ -123,6 +99,7 @@
                             Olá, <span th:text="${resultFunc[0]['nome']}" id="resultNomeLogin" onclick="openUserOptions()"></span>
                         </p>
                         <div id="userOptions">
+                            <a th:href = "@{/Relatorios}" th:if = "${resultFunc[0]['cargo'] == 'Gerente'}">Relatórios</a>
                             <a th:href="@{/logout}" id="logout">Logout</a>
                         </div>
                     </div> 

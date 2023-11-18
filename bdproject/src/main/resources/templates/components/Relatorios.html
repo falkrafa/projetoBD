@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        .report {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .report p {
+            margin: 5px 0;
+            line-height: 1.6;
+        }
+
+        .report span {
+            font-weight: bold;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Relatórios</h1>
+
+        <!-- Produtos com Maior Nota -->
+        <div class="report">
+            <h2>Produtos com Maior Nota</h2>
+            <div th:if="${maiorNotaList}">
+                <div th:each="item : ${maiorNotaList}">
+                    <p>Produto: <span th:text="${item.nome}"></span>, Média Nota: <span th:text="${item.media_nota}"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Produtos com Mais Avaliações -->
+        <div class="report">
+            <h2>Produtos com Mais Avaliações</h2>
+            <div th:if="${maisAvaliacoesList}">
+                <div th:each="item : ${maisAvaliacoesList}">
+                    <p>Produto: <span th:text="${item.nome}"></span>, Número de Avaliações: <span th:text="${item.num_avaliacoes}"></span>, Média Nota: <span th:text="${item.media_nota}"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Continuar para os outros relatórios... -->
+    </div>
+</body>
+</html>

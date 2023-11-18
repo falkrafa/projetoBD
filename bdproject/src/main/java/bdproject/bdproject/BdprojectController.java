@@ -84,7 +84,7 @@ public class BdprojectController {
         List<Map<String, Object>> resultNomeLogin = jdbcTemplate.queryForList(sql, email, senha);
         model.addAttribute("resultNomeLogin", resultNomeLogin);
         
-        String sql2 = "select p.nome, f.id_funcionario from pessoa p join funcionario f on f.cpf_pessoa = p.cpf where p.email = ? and p.senha = ?";
+        String sql2 = "select p.nome, f.id_funcionario, f.cargo from pessoa p join funcionario f on f.cpf_pessoa = p.cpf where p.email = ? and p.senha = ?";
         List<Map<String, Object>> resultFunc = jdbcTemplate.queryForList(sql2, email, senha);
         model.addAttribute("resultFunc", resultFunc);
         System.out.println(resultNomeLogin);
@@ -421,4 +421,93 @@ public class BdprojectController {
 
         return "components/pedidos";
     }    
+    @GetMapping("/Relatorios")
+    public String showRelatorios(@ModelAttribute("user") CustomUser user, Model model) {
+        if( user.isFuncLogged() == false || user.isLoggedIn() == true){
+            return "redirect:/";
+        }
+        String maiorNota = "SELECT p.id_produto, p.nome, AVG(r.nota) as media_nota\r\n" + //
+                            "FROM Produto p\r\n" + //
+                            "JOIN cliente_faz_review_produto cf ON p.id_produto = cf.fk_id_produto\r\n" + //
+                            "JOIN Review r ON cf.fk_id_review = r.id_review\r\n" + //
+                            "GROUP BY p.id_produto\r\n" + //
+                            "ORDER BY media_nota DESC\r\n" + //
+                            "LIMIT 1";
+
+        List<Map<String, Object>> maiorNotaList = jdbcTemplate.queryForList(maiorNota);
+        model.addAttribute("maiorNotaList", maiorNotaList);
+
+        String maisAvaliacoes = "SELECT p.id_produto, p.nome, COUNT(r.id_review) as num_avaliacoes, AVG(r.nota) as media_nota " +
+                        "FROM Produto p " +
+                        "JOIN cliente_faz_review_produto cf ON p.id_produto = cf.fk_id_produto " +
+                        "JOIN Review r ON cf.fk_id_review = r.id_review " +
+                        "GROUP BY p.id_produto " +
+                        "ORDER BY num_avaliacoes DESC, media_nota DESC " +
+                        "LIMIT 1";
+        List<Map<String, Object>> maisAvaliacoesList = jdbcTemplate.queryForList(maisAvaliacoes);
+        model.addAttribute("maisAvaliacoesList", maisAvaliacoesList);
+
+        String maisComentarios = "SELECT p.id_produto, p.nome, COUNT(r.id_review) as num_comentarios " +
+                         "FROM Produto p " +
+                         "JOIN cliente_faz_review_produto cf ON p.id_produto = cf.fk_id_produto " +
+                         "JOIN Review r ON cf.fk_id_review = r.id_review " +
+                         "GROUP BY p.id_produto " +
+                         "ORDER BY num_comentarios DESC " +
+                         "LIMIT 1";
+        List<Map<String, Object>> maisComentariosList = jdbcTemplate.queryForList(maisComentarios);
+        model.addAttribute("maisComentariosList", maisComentariosList);
+
+        String funcionarioMaisRespondeu = "SELECT f.id_funcionario, p.nome, COUNT(r.fk_id_review) as num_respostas " +
+                                  "FROM Funcionario f " +
+                                  "JOIN pessoa p ON f.cpf_pessoa = p.cpf " +
+                                  "JOIN Responde r ON f.id_funcionario = r.fk_id_funcionario " +
+                                  "GROUP BY f.id_funcionario " +
+                                  "ORDER BY num_respostas DESC " +
+                                  "LIMIT 1";
+        List<Map<String, Object>> funcionarioMaisRespondeuList = jdbcTemplate.queryForList(funcionarioMaisRespondeu);
+        model.addAttribute("funcionarioMaisRespondeuList", funcionarioMaisRespondeuList);
+        
+        String produtoMaisPedidos = "SELECT p.id_produto, p.nome, COUNT(c.fk_id_pedido) as num_pedidos " +
+                            "FROM Produto p " +
+                            "JOIN Contem c ON p.id_produto = c.fk_id_produto " +
+                            "GROUP BY p.id_produto " +
+                            "ORDER BY num_pedidos DESC " +
+                            "LIMIT 1";
+        List<Map<String, Object>> produtoMaisPedidosList = jdbcTemplate.queryForList(produtoMaisPedidos);
+        model.addAttribute("produtoMaisPedidosList", produtoMaisPedidosList);
+
+        String clienteMaisComentarios = "SELECT c.id_cliente, p.nome, COUNT(r.id_review) as num_comentarios " +
+                                "FROM Cliente c " +
+                                "JOIN Pessoa p ON c.cpf_pessoa_cliente = p.cpf " +
+                                "JOIN cliente_faz_review_produto cf ON c.id_cliente = cf.fk_id_cliente " +
+                                "JOIN Review r ON cf.fk_id_review = r.id_review " +
+                                "GROUP BY c.id_cliente " +
+                                "ORDER BY num_comentarios DESC " +
+                                "LIMIT 1";
+        List<Map<String, Object>> clienteMaisComentariosList = jdbcTemplate.queryForList(clienteMaisComentarios);
+        model.addAttribute("clienteMaisComentariosList", clienteMaisComentariosList);
+
+        String clienteMaisPedidos = "SELECT c.id_cliente, COUNT(p.id_pedido) as num_pedidos " +
+                            "FROM Cliente c " +
+                            "JOIN Pedido p ON c.id_cliente = p.fk_cliente_id " +
+                            "GROUP BY c.id_cliente " +
+                            "ORDER BY num_pedidos DESC " +
+                            "LIMIT 1";
+        List<Map<String, Object>> clienteMaisPedidosList = jdbcTemplate.queryForList(clienteMaisPedidos);
+        model.addAttribute("clienteMaisPedidosList", clienteMaisPedidosList);
+
+        String transportadoraMaisPrazo = "SELECT t.id_transportadora, t.nome, COUNT(p.id_pedido) as entregas_no_prazo " +
+                                 "FROM Transportadora t " +
+                                 "JOIN Pedido p ON t.id_transportadora = p.fk_id_transportadora " +
+                                 "WHERE p.data_chegada <= p.data_prevista " +
+                                 "GROUP BY t.id_transportadora " +
+                                 "ORDER BY entregas_no_prazo DESC " +
+                                 "LIMIT 1";
+        List<Map<String, Object>> transportadoraMaisPrazoList = jdbcTemplate.queryForList(transportadoraMaisPrazo);
+        model.addAttribute("transportadoraMaisPrazoList", transportadoraMaisPrazoList);
+
+
+
+        return "components/Relatorios";
+    }   
 }

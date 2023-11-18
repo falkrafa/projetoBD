@@ -8,6 +8,7 @@ CREATE TABLE Pessoa (
     constraint pk_pessoa primary key (cpf)
 );
 
+select p.nome from pessoa p where p.email = 'teste1@teste.com'
 
 ALTER TABLE Pessoa
 ADD CONSTRAINT email_Pessoa_ck CHECK (email LIKE '%@%.%');
@@ -24,8 +25,6 @@ cpf_pessoa VARCHAR(14) UNIQUE NOT NULL,
 CONSTRAINT cpf_pessoa_fk FOREIGN KEY (cpf_pessoa) REFERENCES Pessoa(cpf) ON DELETE CASCADE,
 CONSTRAINT funcionario_id_gerente_fk FOREIGN KEY (id_gerente) REFERENCES Funcionario(id_funcionario) ON DELETE CASCADE
 );
-
-
 
 create table Cliente (
 id_cliente int auto_increment,
@@ -47,7 +46,7 @@ nome varchar(100)
 create table pedido (
 id_pedido int auto_increment,
 status varchar(50),
-data_envio date,
+data_compra date,
 data_chegada date,
 data_prevista date,
 fk_cliente_id int,
@@ -58,6 +57,14 @@ constraint cliente_fk_pedido foreign key (fk_cliente_id) references Cliente(id_c
 constraint transportadora_fk_pedido foreign key (fk_id_transportadora) references Transportadora (id_transportadora) on delete cascade
 );
 
+INSERT INTO pedido (status, data_compra, data_prevista, fk_cliente_id, fk_id_transportadora)
+VALUES (
+    'Em processamento', -- ou o status desejado
+    CURRENT_DATE,        -- data_compra como data atual
+    DATE_ADD(CURRENT_DATE, INTERVAL 10 DAY), -- data_prevista como data atual + 10 dias
+    1, -- substitua pelo ID do cliente real
+    1  -- substitua pelo ID da transportadora real
+);
 
 create table review(
 id_review int primary key auto_increment,
@@ -76,11 +83,13 @@ nome varchar(100),
 preco float,
 descricao varchar(500),
 fk_id_categoria int,
+image varchar(500),
+image2 varchar(500),
+image3 varchar(500),
 
 constraint id_produto_pk primary key (id_produto),
 constraint fk_id_categoria_produto foreign key (fk_id_categoria) references Categoria(id_categoria) on delete cascade
 );
-
 
 
 
@@ -131,6 +140,7 @@ constraint fk_id_produto_contem foreign key(fk_id_produto) references Produto(id
 constraint fk_id_pedido_contem foreign key(fk_id_pedido) references Pedido(id_pedido) on delete cascade
 );
 
+
 -- Inserções na tabela Pessoa
 
 INSERT INTO Pessoa (cpf, nome, email, senha) VALUES ('123.456.789-11', 'João da Silva', 'joao@example.com', '123');
@@ -150,44 +160,41 @@ INSERT INTO Cliente (telefone, telefone2, rua, numero, cpf_pessoa_cliente) VALUE
 INSERT INTO Cliente (telefone, telefone2, rua, numero, cpf_pessoa_cliente) VALUES ('555-666-7777', NULL, 'Rua D', 123, '555.666.777-88');
 
 
-
+select * from cliente_faz_review_produto;
 
 -- Inserções na tabela Transportadora
 INSERT INTO Transportadora (id_transportadora, telefone, nome) VALUES (1, '555-123-4567', 'Transportadora A');
 INSERT INTO Transportadora (id_transportadora, telefone, nome) VALUES (2, '555-987-6543', 'Transportadora B');
 
 -- Inserções na tabela pedido
-INSERT INTO pedido (status, data_envio, data_chegada, data_prevista, fk_cliente_id, fk_id_transportadora) VALUES ('Enviado', '2023-11-05', '2023-11-10', '2023-11-15', 1, 1);
+INSERT INTO pedido (status, data_compra, data_chegada, data_prevista, fk_cliente_id, fk_id_transportadora) VALUES ('Enviado', '2023-11-05', '2023-11-10', '2023-11-15', 1, 1);
 
-INSERT INTO pedido (status, data_envio, data_chegada, data_prevista, fk_cliente_id, fk_id_transportadora) VALUES ('Processando', '2023-11-06', NULL, '2023-11-20', 2, 2);
+INSERT INTO pedido (status, data_compra, data_chegada, data_prevista, fk_cliente_id, fk_id_transportadora) VALUES ('Processando', '2023-11-06', NULL, '2023-11-20', 2, 2);
 
 -- Inserções na tabela review
 INSERT INTO review (descricao, nota) VALUES ('Ótimo produto!', 5.0);
 INSERT INTO review (descricao, nota) VALUES ('Bom serviço de entrega.', 4.0);
-
-
-SELECT LAST_INSERT_ID();
 
 -- Inserções na tabela Categoria
 INSERT INTO Categoria (id_categoria, nome) VALUES (1, 'Eletrônicos');
 INSERT INTO Categoria (id_categoria, nome) VALUES (2, 'Roupas');
 
 -- Inserções na tabela Produto
-INSERT INTO Produto (id_produto, nome, preco, descricao, fk_id_categoria) VALUES (1, 'Smartphone', 599.99, 'Um smartphone de última geração', 1);
-INSERT INTO Produto (id_produto, nome, preco, descricao, fk_id_categoria) VALUES (2, 'Camiseta', 19.99, 'Camiseta de algodão', 2);
+INSERT INTO Produto (id_produto, nome, preco, descricao, fk_id_categoria, image) VALUES (1, 'Smartphone', 599.99, 'Um smartphone de última geração', 1, '/images/iphone.jpg');
+INSERT INTO Produto (id_produto, nome, preco, descricao, fk_id_categoria, image) VALUES (2, 'Camiseta', 19.99, 'Camiseta de algodão', 2,  '/images/camisa.jpg');
+INSERT INTO Produto (id_produto, nome, preco, descricao, fk_id_categoria, image) VALUES (4, 'Casaco', 20, 'Casaco de linho', 2,  '/images/casaco.jpg');
 
-INSERT INTO Produto (id_produto, nome, preco, descricao, fk_id_categoria) VALUES (3, 'Laptop', 999.99, 'High-performance laptop', 1);
-
-
+INSERT INTO Produto (id_produto, nome, preco, descricao, fk_id_categoria, image) VALUES (3, 'Laptop', 999.99, 'High-performance laptop', 1,  '/images/laptop.jpg');
 
 -- Inserções na tabela cliente_faz_review_produto
 INSERT INTO cliente_faz_review_produto (fk_id_cliente, fk_id_review, fk_id_produto) VALUES (1, 1, 1);
+
 INSERT INTO cliente_faz_review_produto (fk_id_cliente, fk_id_review, fk_id_produto) VALUES (2, 2, 2);
 
-
 -- Inserções na tabela Responde
-INSERT INTO Responde (fk_id_funcionario, fk_id_review, resposta) VALUES (1, 13, 'Agradecemos pelo seu feedback!');
-INSERT INTO Responde (fk_id_funcionario, fk_id_review, resposta) VALUES (5, 8, 'Estamos trabalhando para melhorar nossas entregas.');
+INSERT INTO Responde (fk_id_funcionario, fk_id_review, resposta) VALUES (1, 1, 'Agradecemos pelo seu feedback!');
+
+INSERT INTO Responde (fk_id_funcionario, fk_id_review, resposta) VALUES (2, 2, 'Estamos trabalhando para melhorar nossas entregas.');
 
 -- Inserções na tabela fornecedor
 INSERT INTO fornecedor (id_fornecedor, nome, telefone) VALUES (1, 'Fornecedor A', '555-111-2222');
@@ -197,9 +204,104 @@ INSERT INTO fornecedor (id_fornecedor, nome, telefone) VALUES (2, 'Fornecedor B'
 INSERT INTO Possui (fk_id_produto, fk_id_fornecedor) VALUES (1, 1);
 INSERT INTO Possui (fk_id_produto, fk_id_fornecedor) VALUES (2, 2);
 
+INSERT INTO pedido (status, data_compra, data_prevista, fk_cliente_id, fk_id_transportadora)
+VALUES (
+    'Em processamento',
+    CURRENT_DATE,
+    DATE_ADD(CURRENT_DATE, INTERVAL 10 DAY),
+    id_cliente,
+    id_transport
+);
+
 -- Inserções na tabela Contem
-INSERT INTO Contem (fk_id_produto, fk_id_pedido, quantidade) VALUES (1, 1, 2);
-INSERT INTO Contem (fk_id_produto, fk_id_pedido, quantidade) VALUES (2, 2, 3);
+INSERT INTO Contem (fk_id_produto, fk_id_pedido, quantidade) VALUES (1, 2, 2);
+INSERT INTO Contem (fk_id_produto, fk_id_pedido, quantidade) VALUES (2, 4, 3);
+INSERT INTO Contem (fk_id_produto, fk_id_pedido, quantidade) VALUES (3, 3, 2);
 
+-- Produtos com maior nota:
+SELECT p.id_produto, p.nome, AVG(r.nota) as media_nota
+FROM Produto p
+JOIN cliente_faz_review_produto cf ON p.id_produto = cf.fk_id_produto
+JOIN Review r ON cf.fk_id_review = r.id_review
+GROUP BY p.id_produto
+ORDER BY media_nota DESC
+LIMIT 1;
 
+-- Produtos com mais avaliações e a sua nota
+SELECT p.id_produto, p.nome, COUNT(r.id_review) as num_avaliacoes, AVG(r.nota) as media_nota
+FROM Produto p
+JOIN cliente_faz_review_produto cf ON p.id_produto = cf.fk_id_produto
+JOIN Review r ON cf.fk_id_review = r.id_review
+GROUP BY p.id_produto
+ORDER BY num_avaliacoes DESC, media_nota DESC
+LIMIT 1;
 
+-- Produto com mais comentários
+
+SELECT p.id_produto, p.nome, COUNT(r.id_review) as num_comentarios
+FROM Produto p
+JOIN cliente_faz_review_produto cf ON p.id_produto = cf.fk_id_produto
+JOIN Review r ON cf.fk_id_review = r.id_review
+GROUP BY p.id_produto
+ORDER BY num_comentarios DESC
+LIMIT 1;
+
+-- Funcionário que mais respondeu
+
+SELECT f.id_funcionario,p.nome, COUNT(r.fk_id_review) as num_respostas
+FROM Funcionario f
+join pessoa p on f.cpf_pessoa = p.cpf 
+JOIN Responde r ON f.id_funcionario = r.fk_id_funcionario
+GROUP BY f.id_funcionario
+ORDER BY num_respostas DESC
+LIMIT 1;
+
+-- Produto com mais pedidos
+
+SELECT p.id_produto, p.nome, COUNT(c.fk_id_pedido) as num_pedidos
+FROM Produto p
+JOIN Contem c ON p.id_produto = c.fk_id_produto
+GROUP BY p.id_produto
+ORDER BY num_pedidos DESC
+LIMIT 1;
+
+-- Cliente que mais realizou comentários
+
+SELECT c.id_cliente,p.nome, COUNT(r.id_review) as num_comentarios
+FROM Cliente c
+join Pessoa p on c.cpf_pessoa_cliente  = p.cpf 
+JOIN cliente_faz_review_produto cf ON c.id_cliente = cf.fk_id_cliente
+JOIN Review r ON cf.fk_id_review = r.id_review
+GROUP BY c.id_cliente
+ORDER BY num_comentarios DESC
+LIMIT 1;
+
+-- Cliente que mais realizou pedidos
+
+SELECT c.id_cliente, COUNT(p.id_pedido) as num_pedidos
+FROM Cliente c
+JOIN Pedido p ON c.id_cliente = p.fk_cliente_id
+GROUP BY c.id_cliente
+ORDER BY num_pedidos DESC
+LIMIT 1;
+
+-- Transportadora mais escolhida
+
+SELECT t.id_transportadora, t.nome, COUNT(p.id_pedido) as num_escolhas
+FROM Transportadora t
+JOIN Pedido p ON t.id_transportadora = p.fk_id_transportadora
+GROUP BY t.id_transportadora
+ORDER BY num_escolhas DESC
+LIMIT 1;
+
+-- Transportadora que mais entregou dentro do prazo
+
+SELECT t.id_transportadora, t.nome, COUNT(p.id_pedido) as entregas_no_prazo
+FROM Transportadora t
+JOIN Pedido p ON t.id_transportadora = p.fk_id_transportadora
+WHERE p.data_chegada <= p.data_prevista
+GROUP BY t.id_transportadora
+ORDER BY entregas_no_prazo DESC
+LIMIT 1;
+
+select * from cliente;
