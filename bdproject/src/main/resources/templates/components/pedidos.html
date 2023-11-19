@@ -3,9 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Meus Pedidos</title>
+    <link th:href="@{/styles/css/pedido.css}" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
 </head>
 <body>
-    teste
+
+    <div class="container">
+        <h1>Meus Pedidos</h1>
+        <div class="pedidos-list">
+            <th:block th:each="entry : ${pedidosPorPedido}">
+                <table class="pedido">
+                    <tr>
+                        <td colspan="2">
+                            <h2>Pedido ID: <span th:text="${entry.key}"></span></h2>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Data da Compra:</td>
+                        <td><span th:text="${entry.value[0]['data_compra']}"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Data Prevista:</td>
+                        <td><span th:text="${entry.value[0]['data_prevista']}"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Data de Chegada:</td>
+                        <td><span th:text="${entry.value[0]['data_chegada']}"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Status:</td>
+                        <td><span th:text="${entry.value[0]['status']}"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Transportadora:</td>
+                        <td><span th:text="${entry.value[0]['nomeTransportadora']}"></span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <button class="cancelar-btn"
+                                    th:if="${entry.value[0]['status'] == 'Em processamento'}"
+                                    th:attr="data-pedido-id=${entry.key}"
+                                    onclick="cancelarPedido(this)">Cancelar Pedido</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <h3>Produtos:</h3>
+                        </td>
+                    </tr>
+                    <th:block th:each="produto : ${entry.value}">
+                        <tr class="produto">
+                            <td>
+                                <img th:src="@{${produto['image']}}" alt="" class="product-image"/>
+                            </td>
+                            <td>
+                                <div class="produto-info">
+                                    <h4 th:text="${produto['nome']}"></h4>
+                                    <p>Preço: R$ <span th:text="${produto['preco']}"></span></p>
+                                    <p>Quantidade: <span th:text="${produto['quantidade']}"></span></p>
+                                </div>
+                            </td>
+                        </tr>
+                    </th:block>
+                </table>
+            </th:block>
+        </div>
+    </div>
+
+    <!-- Adicione o script JavaScript -->
+    <script>
+        var notyf = new Notyf({
+            position: {
+                x: 'center',
+                y: 'top',
+            },
+        });
+        function cancelarPedido(button, pedidoId) {
+            var pedidoId = button.getAttribute("data-pedido-id");
+
+            fetch('/deletePedido', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ pedidoId: pedidoId }),
+            })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                var message = data.message;
+                notyf.success(message);
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            });
+        }
+    </script>
+
 </body>
 </html>

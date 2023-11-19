@@ -23,8 +23,8 @@
                             Olá, <span th:text="${nomeProfile[0]['nome']}" id="resultNomeLogin" onclick="openUserOptions()"></span>
                         </p>
                         <div id="userOptions">
-                            <a th:href="@{'/profile/' + ${resultNomeLogin[0]['id_cliente']}}">meu perfil</a>
-                            <a href="/meusPedidos">meus pedidos</a>
+                            <a th:href="@{'/profile/' + ${resultNomeLogin[0]['id_cliente']}}">Meus perfil</a>
+                            <a th:href="@{'/meusPedidos/' + ${resultNomeLogin[0]['id_cliente']}}">Meus Pedidos</a>
                             <a th:href="@{/logout}" id="logout">Logout</a>
                         </div>
                     </div>  

@@ -35,9 +35,9 @@
                 <div class='reviews'>
                     <div th:with="avaliacao=${resultado[0]['mediaAvaliacoes']}">
                         <div th:variable="totalStars" th:remove="tag">
-                            <th:block th:if="${avaliacao % 2 == 1}">
+                            <!-- <th:block th:if="${avaliacao % 2 == 1}">
                                 <span th:text="${avaliacao - 0.5}"></span>
-                            </th:block>
+                            </th:block> -->
                             <th:block th:if="${avaliacao > 0}">
                                 <span th:each="i : ${#numbers.sequence(1, avaliacao)}">
                                     <i class="fas fa-star"></i>
@@ -338,7 +338,12 @@
         function teste(element) {
             var cliente_id = element.parentNode.querySelector('#cliente_id').getAttribute('id_review_cliente');
             var id_review = element.parentNode.querySelector('#cliente_id').getAttribute('id_review');
-            
+            var notyf = new Notyf({
+            position: {
+                x: 'center',
+                y: 'top',
+            },
+        });
             console.log(id_review);
             fetch('/deleteReview/' + id_review, {
                 method: 'POST',
@@ -351,9 +356,12 @@
             })
             .then(response => response.json())
             .then(data => {
-                alert(data.message);
+            notyf.error(data.message);
+            setTimeout(() => {
                 location.reload();
-            });
+            }, 1000); // Aguarde 1 segundo (1000 milissegundos) antes de recarregar a página
+        });
+
         }
     </script>
 </body>

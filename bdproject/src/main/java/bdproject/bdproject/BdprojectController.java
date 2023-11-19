@@ -11,7 +11,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,10 +135,17 @@ public class BdprojectController {
     }
 
     @GetMapping("/logout")
-    public String logout(@ModelAttribute("user") CustomUser user, @ModelAttribute("carrinho") Carrinho carrinho) {
+    public String logout(@ModelAttribute("user") CustomUser user, @ModelAttribute("carrinho") Carrinho carrinho, Model model) {
         user.setLoggedIn(false);
         user.setFuncLogged(false);
         carrinho.limparCarrinho();
+
+        model.addAttribute("resultNomeLogin", null);
+        model.addAttribute("nomeProfile", null);
+        ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+        .getRequest().getSession().removeAttribute("resultNomeLogin");
+    ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+        .getRequest().getSession().removeAttribute("nomeProfile");
         return "redirect:/";
     }
 
@@ -257,14 +268,16 @@ public class BdprojectController {
      public Map<String, Object> updatePassword (@RequestParam("email") String email, @RequestParam("password") String senha, @ModelAttribute("user") CustomUser user, Model model) {
 
         Map<String, Object> response = new HashMap<>();
-        if(!email.isEmpty() && senha.isEmpty() || senha == null){
+        if(!email.isEmpty() && senha.isEmpty()){
             String sql = "select p.nome from pessoa p where p.email = ?";
             List<Map<String, Object>> resultNomeUpdate = jdbcTemplate.queryForList(sql, email);
-            model.addAttribute("resultNomeUpdate", resultNomeUpdate);
-            if(resultNomeUpdate.isEmpty()){
+            // model.addAttribute("resultNomeUpdate", resultNomeUpdate);
+            // System.out.println(resultNomeUpdate);
+            if(!resultNomeUpdate.isEmpty()){
+                response.put("existe", true);
+            }else{
                 response.put("existe", false);
             }
-            response.put("existe", true);
         }
         else if(!senha.isEmpty()){
             String updatePasswordSql = "UPDATE pessoa SET senha = ? WHERE email = ?";
@@ -344,7 +357,7 @@ public class BdprojectController {
         }
     @PostMapping("/atualizarInformacoes")
     @ResponseBody
-    public Map<String, Object> atualizarInformacoes(@RequestBody Map<String, Object> updateData , Model model) {
+    public Map<String, Object> atualizarInformacoes(@RequestBody Map<String, Object> updateData , Model model, CustomUser user) {
         Map<String, Object> response = new HashMap<>();
 
         String id_clienteString = (String) updateData.get("id_cliente");
@@ -440,14 +453,44 @@ public class BdprojectController {
         return response;
     }
     
-    @GetMapping("/meusPedidos")
-    public String showMeusPedidos(@ModelAttribute("user") CustomUser user, Model model) {
-        if( user.isLoggedIn() == false){
+    @GetMapping("/meusPedidos/{id}")
+    public String showMeusPedidos(@ModelAttribute("user") CustomUser user, Model model, @PathVariable("id") Long id_cliente) {
+        if (user.isLoggedIn() == false) {
             return "redirect:/";
         }
 
+        String sql = "select p.nome, p.preco, p.image, p.id_produto, c.quantidade, pe.id_pedido, pe.data_compra, pe.data_prevista, pe.data_chegada, pe.status, pe.fk_id_transportadora, t.nome as nomeTransportadora from produto p join contem c on c.fk_id_produto = p.id_produto join pedido pe on pe.id_pedido = c.fk_id_pedido join transportadora t on t.id_transportadora = pe.fk_id_transportadora where pe.fk_cliente_id = ?";
+        List<Map<String, Object>> resultPedidos = jdbcTemplate.queryForList(sql, id_cliente);
+
+        Map<Long, List<Map<String, Object>>> pedidosPorPedido = new HashMap<>();
+        for (Map<String, Object> pedido : resultPedidos) {
+            Long idPedido = ((Number) pedido.get("id_pedido")).longValue();
+            pedidosPorPedido.computeIfAbsent(idPedido, k -> new ArrayList<>()).add(pedido);
+        }
+
+        System.out.println(pedidosPorPedido);
+        model.addAttribute("pedidosPorPedido", pedidosPorPedido);
+
         return "components/pedidos";
-    }    
+    }
+    @PostMapping("/deletePedido")
+    @ResponseBody
+    public Map<String, Object> removerPedido(@RequestBody Map<String, Object> pedidoData) {
+        Map<String, Object> response = new HashMap<>();
+
+        String id_pedidoString = (String) pedidoData.get("pedidoId");
+
+        Long id_pedido = Long.parseLong(id_pedidoString);
+
+        System.out.println(id_pedido);
+
+        String sql = "DELETE FROM pedido WHERE id_pedido = ?";
+        jdbcTemplate.update(sql, id_pedido);
+        response.put("message", "Pedido removido com sucesso.");
+        return response;
+    }
+
+   
     @GetMapping("/Relatorios")
     public String showRelatorios(@ModelAttribute("user") CustomUser user, Model model) {
         if( user.isFuncLogged() == false || user.isLoggedIn() == true){
