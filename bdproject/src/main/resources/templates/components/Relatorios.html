@@ -3,51 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link th:href="@{/styles/css/home.css}" rel="stylesheet" />
+    <link th:href="@{/styles/css/relatorio.css}" rel="stylesheet" />
+    <script th:src="@{/js/home.js}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <div th:if="${user.isFuncLogged}" th:include="~{components/home :: navbar-container-func}"></div>
     <title>Relatórios</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            color: #333;
-        }
-
-        .container {
-            width: 80%;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        h1, h2 {
-            color: #333;
-        }
-
-        .report {
-            background-color: white;
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .report p {
-            margin: 5px 0;
-            line-height: 1.6;
-        }
-
-        .report span {
-            font-weight: bold;
-            color: #555;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
         <h1>Relatórios</h1>
 
+        <!-- Adicionando um seletor de relatórios -->
+        <select id="reportSelector">
+            <option value="maiorNota">Produtos com Maior Nota</option>
+            <option value="maisAvaliacoes">Produtos com Mais Avaliações</option>
+            <option value="maisComentario">Produto com mais Comentários</option>
+            <option value="funcionarioMaisRespondeu">Funcionário que mais Respondeu</option>
+            <option value="produtoMaisPedidos">Produto com mais Pedidos</option>
+            <option value="clienteMaisComentarios">Cliente com mais Comentários</option>
+            <option value="clienteMaisPedidos">Cliente com mais Pedidos</option>
+            <option value="transportadoraMaisPrazo">Transportadora com mais Entregas no Prazo</option>
+        </select>
+
+        <!-- Botão para gerar relatório -->
+        <button onclick="generateReport()">Gerar Relatório</button>
+
+        <!-- Loading GIF -->
+        <div class="loading" id="loading-gif">
+            <img src="https://media2.giphy.com/media/hWZBZjMMuMl7sWe0x8/giphy.gif?cid=ecf05e47mpg8eve6yn5jxim0nmt9reudqm8plo8ckyr7vwri&ep=v1_gifs_search&rid=giphy.gif&ct=g" alt="Loading..." />
+        </div>
+
         <!-- Produtos com Maior Nota -->
-        <div class="report">
+        <div class="report" id="maiorNotaReport">
             <h2>Produtos com Maior Nota</h2>
             <div th:if="${maiorNotaList}">
                 <div th:each="item : ${maiorNotaList}">
@@ -57,7 +45,7 @@
         </div>
 
         <!-- Produtos com Mais Avaliações -->
-        <div class="report">
+        <div class="report" id="maisAvaliacoesReport">
             <h2>Produtos com Mais Avaliações</h2>
             <div th:if="${maisAvaliacoesList}">
                 <div th:each="item : ${maisAvaliacoesList}">
@@ -66,7 +54,82 @@
             </div>
         </div>
 
-        <!-- Continuar para os outros relatórios... -->
+        <div class="report" id="maisComentarioReport">
+            <h2>Produto com mais Comentários</h2>
+            <div th:if="${maisComentariosList}">
+                <div th:each="item : ${maisComentariosList}">
+                    <p>Produto: <span th:text="${item.nome}"></span>, Número de Comentários: <span th:text="${item.num_comentarios}"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="report" id="funcionarioMaisRespondeuReport">
+            <h2>Funcionário que mais Respondeu</h2>
+            <div th:if="${funcionarioMaisRespondeuList}">
+                <div th:each="item : ${funcionarioMaisRespondeuList}">
+                    <p>Funcionário: <span th:text="${item.nome}"></span>, Número de Respostas: <span th:text="${item.num_respostas}"></span></p>
+                </div>
+            </div>
+        </div>
+        <div class="report" id="produtoMaisPedidosReport">
+            <h2>Produto com mais Pedidos</h2>
+            <div th:if="${produtoMaisPedidosList}">
+                <div th:each="item : ${produtoMaisPedidosList}">
+                    <p>Produto: <span th:text="${item.nome}"></span>, Número de Pedidos: <span th:text="${item.num_pedidos}"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cliente com mais Comentários -->
+        <div class="report" id="clienteMaisComentariosReport">
+            <h2>Cliente com mais Comentários</h2>
+            <div th:if="${clienteMaisComentariosList}">
+                <div th:each="item : ${clienteMaisComentariosList}">
+                    <p>Cliente: <span th:text="${item.nome}"></span>, Número de Comentários: <span th:text="${item.num_comentarios}"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="report" id="clienteMaisPedidosReport">
+            <h2>Cliente com mais Pedidos</h2>
+            <div th:if="${clienteMaisPedidosList}">
+                <div th:each="item : ${clienteMaisPedidosList}">
+                    <p>Cliente: <span th:text="${item.nome}"></span>, Número de Pedidos: <span th:text="${item.num_pedidos}"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="report" id="transportadoraMaisPrazoReport">
+            <h2>Transportadora com mais Entregas no Prazo</h2>
+            <div th:if="${transportadoraMaisPrazoList}">
+                <div th:each="item : ${transportadoraMaisPrazoList}">
+                    <p>Transportadora: <span th:text="${item.nome}"></span>, Entregas no Prazo: <span th:text="${item.entregas_no_prazo}"></span></p>
+                </div>
+            </div>
     </div>
+
+    <script>
+        function generateReport() {
+            // Exibir o GIF de carregamento
+            document.getElementById("loading-gif").style.display = "flex";
+
+            // Obter o valor selecionado no seletor
+            var selectedReport = document.getElementById("reportSelector").value;
+
+            // Ocultar todos os relatórios
+            var allReports = document.querySelectorAll('.report');
+            allReports.forEach(report => {
+                report.style.display = 'none';
+            });
+
+            // Exibir apenas o relatório selecionado
+            
+            // Ocultar o GIF de carregamento após um atraso simulado (por exemplo, 2 segundos)
+            setTimeout(function() {
+                document.getElementById("loading-gif").style.display = "none";
+                document.getElementById(selectedReport + "Report").style.display = "block";
+            }, 2000);
+        }
+    </script>
 </body>
 </html>

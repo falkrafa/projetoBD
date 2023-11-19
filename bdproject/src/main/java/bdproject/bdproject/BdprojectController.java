@@ -47,10 +47,37 @@ public class BdprojectController {
 
     @GetMapping("/produto/{id}")
     public String showProduct(@PathVariable Long id, Model model) {
-        String sql = "select p.id_produto as idProduto, p.nome as nomeProduto, p.preco as PrecoProduto, p.descricao as DescricaoProduto, c.nome as NomeCategoria\r\n" + //
-                "from produto p \r\n" + //
-                "join categoria c on p.fk_id_categoria = c.id_categoria\r\n" + //
-                "where p.id_produto = ?";
+        String sql = "SELECT \r\n" + //
+                "    p.id_produto as idProduto, \r\n" + //
+                "    p.nome as nomeProduto, \r\n" + //
+                "    p.preco as PrecoProduto, \r\n" + //
+                "    p.descricao as DescricaoProduto, \r\n" + //
+                "    p.image as image1,\r\n" + //
+                "    p.image2 as image2, \r\n" + //
+                "    p.image3 as image3, \r\n" + //
+                "    c.nome as NomeCategoria,\r\n" + //
+                "    COALESCE(avaliacoes.num_avaliacoes, 0) as numAvaliacoes,\r\n" + //
+                "    COALESCE(avaliacoes.media_nota, 0) as mediaAvaliacoes\r\n" + //
+                "FROM \r\n" + //
+                "    produto p\r\n" + //
+                "JOIN \r\n" + //
+                "    categoria c ON p.fk_id_categoria = c.id_categoria\r\n" + //
+                "LEFT JOIN (\r\n" + //
+                "    SELECT \r\n" + //
+                "        p.id_produto, \r\n" + //
+                "        COUNT(r.id_review) as num_avaliacoes, \r\n" + //
+                "        AVG(r.nota) as media_nota\r\n" + //
+                "    FROM \r\n" + //
+                "        produto p\r\n" + //
+                "    JOIN \r\n" + //
+                "        cliente_faz_review_produto cf ON p.id_produto = cf.fk_id_produto\r\n" + //
+                "    JOIN \r\n" + //
+                "        review r ON cf.fk_id_review = r.id_review\r\n" + //
+                "    GROUP BY \r\n" + //
+                "        p.id_produto\r\n" + //
+                ") as avaliacoes ON p.id_produto = avaliacoes.id_produto\r\n" + //
+                "WHERE \r\n" + //
+                "    p.id_produto = ?;";
         String sql2 = "select p.nome as nomeReview, r.descricao as descricaoReview, r.nota as nota, r.id_review as idReview,r2.resposta as Resposta,\r\n" + //
                 "p2.nome as nomeFuncionario, cfrp.fk_id_cliente as idCliente from cliente_faz_review_produto cfrp\r\n" + //
                 "join cliente c on c.id_cliente = cfrp.fk_id_cliente  \r\n" + //
@@ -147,7 +174,7 @@ public class BdprojectController {
 
         carrinho.adicionarItem(jdbcTemplate, id);
         response.put("itens", carrinho.getItens());
-        response.put("message", "Item adicionado com sucesso."); 
+        response.put("message", "Item added successfully!"); 
         return response;
     }
 
@@ -487,8 +514,9 @@ public class BdprojectController {
         List<Map<String, Object>> clienteMaisComentariosList = jdbcTemplate.queryForList(clienteMaisComentarios);
         model.addAttribute("clienteMaisComentariosList", clienteMaisComentariosList);
 
-        String clienteMaisPedidos = "SELECT c.id_cliente, COUNT(p.id_pedido) as num_pedidos " +
+        String clienteMaisPedidos = "SELECT c.id_cliente, p2.nome, COUNT(p.id_pedido) as num_pedidos " +
                             "FROM Cliente c " +
+                            "JOIN Pessoa p2 ON c.cpf_pessoa_cliente = p2.cpf " +
                             "JOIN Pedido p ON c.id_cliente = p.fk_cliente_id " +
                             "GROUP BY c.id_cliente " +
                             "ORDER BY num_pedidos DESC " +

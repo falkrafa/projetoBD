@@ -6,111 +6,137 @@
         <link th:href="@{/styles/css/produto.css}" rel="stylesheet" />
         <link th:href="@{/styles/css/home.css}" rel="stylesheet" />
         <script th:src="@{/js/home.js}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <div th:if="${!user.isFuncLogged}" th:include="~{components/home :: navbar-container}"></div>
         <div th:if="${user.isFuncLogged}" th:include="~{components/home :: navbar-container-func}"></div>
         <div th:if="${!user.isFuncLogged}" th:include="~{components/home :: cart-sidebar}"></div>
 
-
-
 </head>
 <body>
     <section class="teste" th:if="${!user.isFuncLogged}">
-        <h1>Detalhes do Produto</h1>
-        <table>
-            <tr>
-                <th>NOME</th>
-                <th>PRECO</th>
-                <th>DESCRICAO</th>
-                <th>CATEGORIA</th>
-            </tr>
-            <tr th:each="row : ${resultado}">
-                <td th:text="${row['nomeProduto']}"></td>
-                <td th:text="'$ ' + ${row['PrecoProduto']}"></td>
-                <td th:text="${row['DescricaoProduto']}"></td>
-                <td th:text="${row['NomeCategoria']}"></td>
-                <td>
-                    <button th:attr="data-product-id=${row['idProduto']}" class="add-to-cart-button">Adicionar ao Carrinho</button>
-                </td>     
-            </tr>
-        </table>
-        <!-- <table th:if="${not #lists.isEmpty(resultadoReview)}">
-            <tr>
-                <th>NOME</th>
-                <th>Review</th>
-                <th>Nota</th>
-            </tr>
-            <tr th:each="resultado: ${resultadoReview}">
-                <td th:text="${resultado['nomeReview']}"></td>
-                <td th:text="${resultado['descricaoReview']}"></td>
-                <td th:text="${resultado['nota']}"></td>
-            </tr>
-        </table> -->
-    
-        <div class="review-container" th:if="${not #lists.isEmpty(resultNomeLogin) }">
-            <h2>Avaliações</h2>
-            <div class="review-box" th:each="resultado: ${resultadoReview}">
-                <div class="review-head">
-                    <div class="review-top">
-                        <p class="review-name" th:text="${resultado['nomeReview']}"></p>
-                        <span th:if="${resultNomeLogin[0]['id_cliente'] eq resultado['idCliente']}" 
-                            id="cliente_id" 
-                            onclick="teste(this)" 
-                            th:attr="id_review_cliente=${resultado['idCliente']}, id_review=${resultado['idReview']}" class="delete_review"><i class=" fa fa-solid fa-trash"></i></span>
+        <div class="product-detail-container">
+            <div>
+                <div class="image-container">
+                    <img id="mainImage" th:src="@{${resultado[0]['image1']}}" alt="" class="product-detail-image"/>
+                </div>
+                <div class="small-images-container">
+                    <div th:each="i, index : ${#numbers.sequence(1, 3)}">
+                        <img th:src="@{${resultado[0]['image' + i]}}"
+                             th:class="${i == index} ? 'small-image selected-image' : 'small-image'"
+                             th:onmouseover="'updateMainImage(\'' + @{${resultado[0]['image' + i]}} + '\')'"
+                        />
                     </div>
-                    <p class="review-rate" th:utext="${#strings.repeat('&#9733;', resultado['nota'])}"></p>
                 </div>
-                <div class="review-description">
-                    Descrição:
-                    <p th:text="${resultado['descricaoReview']}"></p>
-                </div>
-              
-                <span th:if="${resultado['Resposta'] != null}" id="resposta" onclick="openResponse(this)">Resposta</span>
-                <div th:if="${resultado['Resposta'] != null}" class="resposta-container">
-                    <p th:text="${resultado['nomeFuncionario']} + ':'" class="func-name"></p>
-                    <p th:text="${resultado['Resposta']}" class="func-response"></p>
-                </div>        
             </div>
-            <div th:if="${#lists.isEmpty(resultadoReview)}">
-                <p>Nenhum review disponível.</p>
+            <div class='product-detail-desc'>
+                <h1 th:text="${resultado[0]['nomeProduto']}"></h1>
+                <div class='reviews'>
+                    <div th:with="avaliacao=${resultado[0]['mediaAvaliacoes']}">
+                        <div th:variable="totalStars" th:remove="tag">
+                            <th:block th:if="${avaliacao % 2 == 1}">
+                                <span th:text="${avaliacao - 0.5}"></span>
+                            </th:block>
+                            <th:block th:if="${avaliacao > 0}">
+                                <span th:each="i : ${#numbers.sequence(1, avaliacao)}">
+                                    <i class="fas fa-star"></i>
+                                </span>
+                            </th:block>
+                            <th:block th:if="${avaliacao % 1 != 0}">
+                                <i class="fas fa-star-half-alt"></i>
+                            </th:block>
+                            <th:block th:if="${avaliacao < 5}">
+                                <span th:each="i : ${#numbers.sequence(1, 5 - avaliacao)}">
+                                    <i class="far fa-star"></i>
+                                </span>
+                            </th:block>
+                        </div>
+                    </div>
+                    <p th:text="'(' + ${resultado[0]['numAvaliacoes']} + ')'"></p>
+                </div>
+                <h4>Details: </h4>
+                <p th:text="${resultado[0]['DescricaoProduto']}"></p>
+                <p class='price' th:text="'$' + ${resultado[0]['PrecoProduto']}"></p>
+                <div class='buttons'>
+                    <button th:attr="data-product-id=${resultado[0]['idProduto']}" class="add-to-cart-button">Add to Cart</button>
+                </div>
             </div>
         </div>
-        <div class="review-container" th:if="${#lists.isEmpty(resultNomeLogin)}">
+        <div class="review-section">
             <h2>Avaliações</h2>
-            <div class="review-box" th:each="resultado: ${resultadoReview}">
-                <div class="review-head">
-                    <p class="review-name" th:text="${resultado['nomeReview']}"></p>
-                    <p class="review-rate" th:utext="${#strings.repeat('&#9733;', resultado['nota'])}"></p>
+            <div class="review-container" th:if="${not #lists.isEmpty(resultNomeLogin) }">
+                <div class="container-head">
+                    <div th:if="${not #lists.isEmpty(resultNomeLogin)}">
+                        <button id="addReviewButton" class="add-review-button" th:attr="data-id-produto-review=${resultado[0]['idProduto']}, data-id-cliente=${resultNomeLogin[0]['id_cliente']}, userLogged=${user.isLoggedIn}">Adicionar Review</button>
+                    </div>
+                    
+                    <div th:if="${#lists.isEmpty(resultNomeLogin)}">
+                        <button class="add-review-button" th:attr="userLogged=${user.isLoggedIn}">Adicionar Review</button>
+                    </div>
                 </div>
-                <div class="review-description">
-                    Descrição:
-                    <p th:text="${resultado['descricaoReview']}"></p>
+                <div class="review-box" th:each="resultado: ${resultadoReview}">
+                    <div class="review-head">
+                        <div class="review-top">
+                            <p class="review-name" th:text="${resultado['nomeReview']}"></p>
+                            <span th:if="${resultNomeLogin[0]['id_cliente'] eq resultado['idCliente']}" 
+                                id="cliente_id" 
+                                onclick="teste(this)" 
+                                th:attr="id_review_cliente=${resultado['idCliente']}, id_review=${resultado['idReview']}" class="delete_review"><i class=" fa fa-solid fa-trash"></i></span>
+                        </div>
+                        <p class="review-rate" th:utext="${#strings.repeat('&#9733;', resultado['nota'])}"></p>
+                    </div>
+                    <div class="review-description">
+                        Descrição:
+                        <p th:text="${resultado['descricaoReview']}"></p>
+                    </div>
+                  
+                    <span th:if="${resultado['Resposta'] != null}" id="resposta" onclick="openResponse(this)">Resposta</span>
+                    <div th:if="${resultado['Resposta'] != null}" class="resposta-container">
+                        <p th:text="${resultado['nomeFuncionario']} + ':'" class="func-name"></p>
+                        <p th:text="${resultado['Resposta']}" class="func-response"></p>
+                    </div>        
                 </div>
-                <span th:if="${resultado['Resposta'] != null}" id="resposta" onclick="openResponse(this)">Resposta</span>
-                <div th:if="${resultado['Resposta'] != null}" class="resposta-container">
-                    <p th:text="${resultado['nomeFuncionario']} + ':'" class="func-name"></p>
-                    <p th:text="${resultado['Resposta']}" class="func-response"></p>
-                </div>        
+                <div th:if="${#lists.isEmpty(resultadoReview)}">
+                    <p>Nenhum review disponível.</p>
+                </div>
             </div>
-            <div th:if="${#lists.isEmpty(resultadoReview)}">
-                <p>Nenhum review disponível.</p>
+            <div class="review-container" th:if="${#lists.isEmpty(resultNomeLogin)}">
+                <div class="container-head">
+                    <div th:if="${not #lists.isEmpty(resultNomeLogin)}">
+                        <button id="addReviewButton" class="add-review-button" th:attr="data-id-produto-review=${resultado[0]['idProduto']}, data-id-cliente=${resultNomeLogin[0]['id_cliente']}, userLogged=${user.isLoggedIn}">Adicionar Review</button>
+                    </div>
+                    
+                    <div th:if="${#lists.isEmpty(resultNomeLogin)}">
+                        <button class="add-review-button" th:attr="userLogged=${user.isLoggedIn}">Adicionar Review</button>
+                    </div>
+                </div>
+                <div class="review-box" th:each="resultado: ${resultadoReview}">
+                    <div class="review-head">
+                        <p class="review-name" th:text="${resultado['nomeReview']}"></p>
+                        <p class="review-rate" th:utext="${#strings.repeat('&#9733;', resultado['nota'])}"></p>
+                    </div>
+                    <div class="review-description">
+                        Descrição:
+                        <p th:text="${resultado['descricaoReview']}"></p>
+                    </div>
+                    <span th:if="${resultado['Resposta'] != null}" id="resposta" onclick="openResponse(this)">Resposta</span>
+                    <div th:if="${resultado['Resposta'] != null}" class="resposta-container">
+                        <p th:text="${resultado['nomeFuncionario']} + ':'" class="func-name"></p>
+                        <p th:text="${resultado['Resposta']}" class="func-response"></p>
+                    </div>        
+                </div>
+                <div th:if="${#lists.isEmpty(resultadoReview)}">
+                    <p>Nenhum review disponível.</p>
+                </div>
             </div>
         </div>
         
-    
-        
-        <div th:if="${not #lists.isEmpty(resultNomeLogin)}">
-            <button id="addReviewButton" class="add-review-button" th:attr="data-id-produto-review=${resultado[0]['idProduto']}, data-id-cliente=${resultNomeLogin[0]['id_cliente']}, userLogged=${user.isLoggedIn}">Adicionar Review</button>
-        </div>
-        
-        <div th:if="${#lists.isEmpty(resultNomeLogin)}">
-            <button class="add-review-button" th:attr="userLogged=${user.isLoggedIn}">Adicionar Review</button>
-        </div>
-        
-    
         <div id="reviewModal" class="modal">
             <div class="modal-content">
-                <span class="close" onclick="closeModal()">&times;</span>
+                <div class="modal-head">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                </div>
                 <h2>Adicionar Review</h2>
                 <form id="reviewForm">
                     <label for="nota">Nota:</label>
@@ -124,6 +150,7 @@
             </div>
         </div>
     </section>
+
     <section class="teste" th:if="${user.isFuncLogged}">
         <h1>Detalhes do Produto</h1>
         <table>
@@ -185,6 +212,15 @@
 
 
     <script type="text/javascript">
+        function updateMainImage(newSrc) {
+            document.getElementById('mainImage').src = newSrc;
+        }
+        var notyf = new Notyf({
+            position: {
+                x: 'center',
+                y: 'top',
+            },
+        });
         document.querySelectorAll('.add-to-cart-button').forEach(function(button) {
             button.addEventListener('click', function() {
                 var productId = this.getAttribute('data-product-id');
@@ -196,7 +232,7 @@
                     .then(function (data) {
                         var message = data.message;
                         if(message){
-                            alert(message)
+                            notyf.success(message);
                         }
                 });
             });
@@ -206,6 +242,7 @@
                 var userLogged = this.getAttribute('userLogged');
                 if(userLogged == 'true'){
                     document.getElementById('reviewModal').style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
                 }
                 else{
                     window.location.href = '/login';
@@ -246,8 +283,9 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    alert(data.sucesso);
+                    notyf.success(data.sucesso);
                     document.getElementById('reviewModal').style.display = 'none';
+                    document.body.style.overflow = 'auto';
                     location.reload();
                 });
          });
@@ -275,15 +313,20 @@
 
         document.querySelector('.close').addEventListener('click', function() {
             document.getElementById('reviewModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
         });
 
         function closeModal() {
             document.getElementById('reviewModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+
         }
 
+        
         window.addEventListener('click', function(event) {
-            if (event.target === document.getElementById('reviewModal')) {
-            document.getElementById('reviewModal').style.display = 'none';
+            var reviewModal = document.getElementById('reviewModal');
+            if (event.target !== reviewModal && !reviewModal.contains(event.target)) {
+                reviewModal.style.display = 'none';
             }
         });
 

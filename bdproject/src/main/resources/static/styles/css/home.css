@@ -5,18 +5,29 @@
     box-sizing: border-box;
     font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    scrollbar-width: none;
+    &::-webkit-scrollbar{
+      display: none;
+    }
 }
-
+::-webkit-scrollbar {
+  width: 0px;
+}
 .navbar {
+  background-color: rgba(255, 255, 255, 0.8);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
+    padding: 10px 50px;
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
     width: 100%;
     color: black;
 }
-
+.section{
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+}
 .user-info {
     display: flex;
     align-items: center;
@@ -197,13 +208,15 @@
     width: 100%;
   }
   .products-section{
-    height: 100vh;
+
+    height: 90%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;
     scroll-snap-align: center;
+    color: white;
   }
   .products-container{
     text-decoration: none;
@@ -222,6 +235,7 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
+    color: white;
   }
   .product-card{
     cursor: pointer;
@@ -240,16 +254,23 @@
   }
   .product-name{
     font-weight: 500;
-    color: black;
   }
   .product-price{
     font-weight: 600;
     margin-top: 6px;
-    color: black;
   }
   .product .cart-product-image{
     width:180px ;
     height: 150px;
       border-radius: 15px;
    background-color: #ebebeb;
+  }
+  .delete_review{
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: red;
+  }
+  .delete_review :hover{
+    color: darkred;
   }

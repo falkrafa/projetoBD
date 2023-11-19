@@ -150,7 +150,12 @@ function atualizarCarrinho() {
         });
 }
 
-
+        var notyf = new Notyf({
+            position: {
+                x: 'center',
+                y: 'top',
+            },
+        });
 
         // Function to delete an item from the cart
         function deleteCartItem(productId) {
@@ -163,7 +168,7 @@ function atualizarCarrinho() {
             }).then(response => {
                 return response.json(); // Assuming your endpoint returns a JSON response
             }).then(data => {
-                alert(data.message); // Alert the message from the server
+                notyf.error(data.message);// Alert the message from the server
                 var itemElement = document.getElementById('cart-item-' + productId);
                 if (itemElement) {
                     itemElement.remove(); // This will remove the item from the DOM
