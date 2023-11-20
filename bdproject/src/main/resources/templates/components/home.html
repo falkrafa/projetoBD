@@ -36,10 +36,29 @@
         <div class='products-section'>
             <div class='products-heading'>
                 <h1>Produtos</h1>
+                <div class="heading-buttons">
+                    <button class='active' onclick="bestSell()" id="button1">
+                        Best Selling
+                    </button>
+                    <button onclick="allProduct()" id="button2">
+                        All Products
+                    </button>
+                </div>
             </div>
-            <div class='products-section'>
+            <div class='products-section' id="allProducts" style="display: none;">
                 <div class='products-container'>
                     <div th:each="resultado : ${resultados}" th:data-href="@{/produto/__${resultado['id_produto']}__}" onclick="window.location.href=this.getAttribute('data-href');">
+                        <div class="product-card">
+                            <img th:src="@{${resultado['image']}}" class='product-image'></img>
+                            <p class='product-name' th:text="${resultado['nome']}"></p>
+                            <p class='product-price' th:text=" 'R$ ' + ${resultado['preco']}"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class='products-section' id="BestProducts">
+                <div class='products-container'>
+                    <div th:each="resultado : ${bestSellerList}" th:data-href="@{/produto/__${resultado['id_produto']}__}" onclick="window.location.href=this.getAttribute('data-href');">
                         <div class="product-card">
                             <img th:src="@{${resultado['image']}}" class='product-image'></img>
                             <p class='product-name' th:text="${resultado['nome']}"></p>
@@ -91,7 +110,7 @@
     </section>
 
 
-    <section th:if="${user.isFuncLogged}">
+    <section th:if="${user.isFuncLogged}" class="section">
         <div th:fragment="navbar-container-func">
             <nav class="navbar">
                 <div class="user-info">
@@ -109,17 +128,30 @@
         </div>
         
         
-        <h1>Lista de produtos</h1>
-        <table>
-            <tr>
-                <th>Produtos</th>
-            </tr>
-            <tr th:each="resultado : ${resultados}">
-                <td>
-                    <a th:href="@{'/produto/' + ${resultado['id_produto']}}"><span th:text="${resultado['nome']}"></span></a>
-                </td>
-            </tr>
-        </table>
+        <div class='products-section'>
+            <div class='products-heading'>
+                <h1>Produtos</h1>
+                <div class="heading-buttons">
+                    <button class='active' onclick="bestSell()" id="button1">
+                        Best Selling
+                    </button>
+                    <button onclick="allProduct()" id="button2">
+                        All Products
+                    </button>
+                </div>
+            </div>
+            <div class='products-section'>
+                <div class='products-container'>
+                    <div th:each="resultado : ${resultados}" th:data-href="@{/produto/__${resultado['id_produto']}__}" onclick="window.location.href=this.getAttribute('data-href');">
+                        <div class="product-card">
+                            <img th:src="@{${resultado['image']}}" class='product-image'></img>
+                            <p class='product-name' th:text="${resultado['nome']}"></p>
+                            <p class='product-price' th:text=" 'R$ ' + ${resultado['preco']}"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
 

@@ -55,6 +55,8 @@
                     </div>
                     <p th:text="'(' + ${resultado[0]['numAvaliacoes']} + ')'"></p>
                 </div>
+                <h4>Category: </h4>
+                <p th:text="${resultado[0]['NomeCategoria']}"></p>
                 <h4>Details: </h4>
                 <p th:text="${resultado[0]['DescricaoProduto']}"></p>
                 <p class='price' th:text="'$' + ${resultado[0]['PrecoProduto']}"></p>
@@ -152,21 +154,52 @@
     </section>
 
     <section class="teste" th:if="${user.isFuncLogged}">
-        <h1>Detalhes do Produto</h1>
-        <table>
-            <tr>
-                <th>NOME</th>
-                <th>PRECO</th>
-                <th>DESCRICAO</th>
-                <th>CATEGORIA</th>
-            </tr>
-            <tr th:each="row : ${resultado}">
-                <td th:text="${row['nomeProduto']}"></td>
-                <td th:text="'$ ' + ${row['PrecoProduto']}"></td>
-                <td th:text="${row['DescricaoProduto']}"></td>
-                <td th:text="${row['NomeCategoria']}"></td>  
-            </tr>
-        </table>
+        <div class="product-detail-container">
+            <div>
+                <div class="image-container">
+                    <img id="mainImage" th:src="@{${resultado[0]['image1']}}" alt="" class="product-detail-image"/>
+                </div>
+                <div class="small-images-container">
+                    <div th:each="i, index : ${#numbers.sequence(1, 3)}">
+                        <img th:src="@{${resultado[0]['image' + i]}}"
+                             th:class="${i == index} ? 'small-image selected-image' : 'small-image'"
+                             th:onmouseover="'updateMainImage(\'' + @{${resultado[0]['image' + i]}} + '\')'"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class='product-detail-desc'>
+                <h1 th:text="${resultado[0]['nomeProduto']}"></h1>
+                <div class='reviews'>
+                    <div th:with="avaliacao=${resultado[0]['mediaAvaliacoes']}">
+                        <div th:variable="totalStars" th:remove="tag">
+                            <!-- <th:block th:if="${avaliacao % 2 == 1}">
+                                <span th:text="${avaliacao - 0.5}"></span>
+                            </th:block> -->
+                            <th:block th:if="${avaliacao > 0}">
+                                <span th:each="i : ${#numbers.sequence(1, avaliacao)}">
+                                    <i class="fas fa-star"></i>
+                                </span>
+                            </th:block>
+                            <th:block th:if="${avaliacao % 1 != 0}">
+                                <i class="fas fa-star-half-alt"></i>
+                            </th:block>
+                            <th:block th:if="${avaliacao < 5}">
+                                <span th:each="i : ${#numbers.sequence(1, 5 - avaliacao)}">
+                                    <i class="far fa-star"></i>
+                                </span>
+                            </th:block>
+                        </div>
+                    </div>
+                    <p th:text="'(' + ${resultado[0]['numAvaliacoes']} + ')'"></p>
+                </div>
+                <h4>Category: </h4>
+                <p th:text="${resultado[0]['NomeCategoria']}"></p>
+                <h4>Details: </h4>
+                <p th:text="${resultado[0]['DescricaoProduto']}"></p>
+                <p class='price' th:text="'$' + ${resultado[0]['PrecoProduto']}"></p>
+            </div>
+        </div>
         <!-- <table th:if="${not #lists.isEmpty(resultadoReview)}">
             <tr>
                 <th>NOME</th>
@@ -179,19 +212,20 @@
                 <td th:text="${resultado['nota']}"></td>
             </tr>
         </table> -->
-    
-        <div class="review-container">
+        <div class="review-section">
             <h2>Avaliações</h2>
-            <div class="review-box" th:each="resultado: ${resultadoReview}" th:if="${resultado['Resposta'] == null}">
-                <div class="review-head">
-                    <p class="review-name" th:text="${resultado['nomeReview']}"></p>
-                    <p class="review-rate" th:utext="${#strings.repeat('&#9733;', resultado['nota'])}"></p>
+            <div class="review-container">
+                <div class="review-box" th:each="resultado: ${resultadoReview}" th:if="${resultado['Resposta'] == null}">
+                    <div class="review-head">
+                        <p class="review-name" th:text="${resultado['nomeReview']}"></p>
+                        <p class="review-rate" th:utext="${#strings.repeat('&#9733;', resultado['nota'])}"></p>
+                    </div>
+                    <div class="review-description">
+                        Descrição:
+                        <p th:text="${resultado['descricaoReview']}"></p>
+                    </div>
+                    <span id="resposta" onclick="response(this)" th:attr="logged=${user.isFuncLogged}, data-id-review=${resultado['idReview']}, data-id-func=${resultFunc[0]['id_funcionario']}">Responder</span>
                 </div>
-                <div class="review-description">
-                    Descrição:
-                    <p th:text="${resultado['descricaoReview']}"></p>
-                </div>
-                <span id="resposta" onclick="response(this)" th:attr="logged=${user.isFuncLogged}, data-id-review=${resultado['idReview']}, data-id-func=${resultFunc[0]['id_funcionario']}">Responder</span>
             </div>
         </div>
         

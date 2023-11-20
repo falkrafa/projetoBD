@@ -39,7 +39,7 @@
             <h2>Produtos com Maior Nota</h2>
             <div th:if="${maiorNotaList}">
                 <div th:each="item : ${maiorNotaList}">
-                    <p>Produto: <span th:text="${item.nome}"></span>, Média Nota: <span th:text="${item.media_nota}"></span></p>
+                    <p>Produto: <span th:text="${item.nomeProduto}"></span>, Média Nota: <span th:text="${item.media_nota}"></span></p>
                 </div>
             </div>
         </div>

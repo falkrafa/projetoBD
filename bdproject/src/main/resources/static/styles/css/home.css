@@ -231,14 +231,24 @@
     scroll-snap-align: start;
   }
   .products-heading{
-    width: 20%;
+    width: 30%;
     text-align: center;
     margin: 70px 0px;
     display: flex;
-    justify-content: space-around;
+    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
     color: white;
   }
+  .products-heading h1{
+    margin-bottom: 20px;
+  }
+.heading-buttons{
+  display: flex;
+  width: 80%;
+  align-items: center;
+  justify-content: space-around;
+}
   .product-card{
     cursor: pointer;
     transition: transform 0.5s ease;
@@ -287,4 +297,15 @@
   }
   .login-button:hover{
     background-color: darkcyan;
+  }
+  .products-heading button{
+    padding-bottom:10px ;
+    color: white;
+    font-size: 25px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  .products-heading .active{
+    border-bottom: cornflowerblue 2px solid;
   }

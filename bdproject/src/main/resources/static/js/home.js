@@ -259,6 +259,22 @@ function atualizarCarrinho() {
             }, 5000); 
         }
         
+        function bestSell(){
+            document.getElementById("BestProducts").style.display = "flex";
+            document.getElementById("allProducts").style.display = "none";
+
+            document.getElementById('button1').classList.add('active');
+            document.getElementById('button2').classList.remove('active');
+        }
+        
+        function allProduct(){
+            document.getElementById("BestProducts").style.display = "none";
+            document.getElementById("allProducts").style.display = "flex";
+
+            document.getElementById('button1').classList.remove('active');
+            document.getElementById('button2').classList.add('active');
+        }
+        
         document.addEventListener('DOMContentLoaded', function () {
             
 

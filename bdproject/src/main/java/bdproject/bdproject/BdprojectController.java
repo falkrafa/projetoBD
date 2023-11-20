@@ -5,10 +5,12 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -46,6 +48,17 @@ public class BdprojectController {
         List<Map<String, Object>> resultadoTransportadora = jdbcTemplate.queryForList("SELECT * FROM transportadora");
         model.addAttribute("resultadoTransportadora", resultadoTransportadora );
         model.addAttribute("user", user);
+
+        String bestSeller = "SELECT p.id_produto, p.nome, p.image,p.preco, COUNT(c.fk_id_pedido) as num_pedidos " +
+                                "FROM Produto p " +
+                                "JOIN Contem c ON p.id_produto = c.fk_id_produto " +
+                                "GROUP BY p.id_produto " +
+                                "ORDER BY num_pedidos DESC " +
+                                "LIMIT 3";
+        List<Map<String, Object>> bestSellerList = jdbcTemplate.queryForList(bestSeller);
+        model.addAttribute("bestSellerList", bestSellerList);
+        System.out.println(bestSellerList);
+        
         return "components/home";
     }
 
@@ -496,13 +509,13 @@ public class BdprojectController {
         if( user.isFuncLogged() == false || user.isLoggedIn() == true){
             return "redirect:/";
         }
-        String maiorNota = "SELECT p.id_produto, p.nome, AVG(r.nota) as media_nota\r\n" + //
-                            "FROM Produto p\r\n" + //
-                            "JOIN cliente_faz_review_produto cf ON p.id_produto = cf.fk_id_produto\r\n" + //
-                            "JOIN Review r ON cf.fk_id_review = r.id_review\r\n" + //
-                            "GROUP BY p.id_produto\r\n" + //
-                            "ORDER BY media_nota DESC\r\n" + //
-                            "LIMIT 1";
+        String maiorNota = "SELECT idProduto, nomeProduto, media_nota \r\n" + //
+                "FROM (SELECT p.id_produto as idProduto, p.nome as nomeProduto, AVG(r.nota) as media_nota\r\n" + //
+                "FROM Produto p\r\n" + //
+                "JOIN cliente_faz_review_produto cf ON p.id_produto = cf.fk_id_produto\r\n" + //
+                "JOIN Review r ON cf.fk_id_review = r.id_review\r\n" + //
+                "GROUP BY p.id_produto) AS subquery\r\n" + //
+                "ORDER BY media_nota DESC LIMIT 1";
 
         List<Map<String, Object>> maiorNotaList = jdbcTemplate.queryForList(maiorNota);
         model.addAttribute("maiorNotaList", maiorNotaList);
