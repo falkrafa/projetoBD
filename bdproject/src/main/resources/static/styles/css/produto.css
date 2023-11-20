@@ -14,7 +14,7 @@
     align-items: center;
   }
  body{
-  background-color: black;
+  background-color: #28282B;
   scrollbar-width: none;
     &::-webkit-scrollbar{
       display: none;

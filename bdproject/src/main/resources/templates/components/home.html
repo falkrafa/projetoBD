@@ -28,7 +28,7 @@
                             <a th:href="@{/logout}" id="logout">Logout</a>
                         </div>
                     </div>  
-                    <a th:unless="${user.isLoggedIn}" th:href="@{/login}" id="login">Login</a>
+                    <a th:unless="${user.isLoggedIn}" th:href="@{/login}" id="login" class='login-button'>Login</a>
                 </div>
                 <div id="cart-symbol" onclick="toggleCartSidebar()"><i class="fa fa-shopping-cart" style="font-size:25px;"></i></div>
             </nav>
@@ -43,7 +43,7 @@
                         <div class="product-card">
                             <img th:src="@{${resultado['image']}}" class='product-image'></img>
                             <p class='product-name' th:text="${resultado['nome']}"></p>
-                            <p class='product-price' th:text="${resultado['preco']}"></p>
+                            <p class='product-price' th:text=" 'R$ ' + ${resultado['preco']}"></p>
                         </div>
                     </div>
                 </div>

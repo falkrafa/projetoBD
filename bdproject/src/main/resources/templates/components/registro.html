@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link th:href="@{/styles/css/registro.css}" rel="stylesheet" />
     <title>Registration Form</title>
 </head>
 <body>
@@ -19,7 +20,7 @@
             <label for="name">Nome Completo:</label>
             <input type="text" id="name" name="name" required>
 
-            <label for="name">CPF(lembre-se de usar . e -):</label>
+            <label for="cpf">CPF(lembre-se de usar . e -):</label>
             <input type="text" id="cpf" name="cpf" required>
 
             <label for="email">Email:</label>
@@ -88,6 +89,28 @@
     </form>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var cpfField = document.getElementById('cpf');
+
+            cpfField.addEventListener('input', function() {
+                var cpf = cpfField.value.replace(/\D/g, ''); // Remove tudo que não for número
+                var formattedCpf = cpf;
+
+                // Adiciona ponto após o terceiro e o sexto dígito
+                if (cpf.length >= 4) {
+                    formattedCpf = cpf.substring(0, 3) + '.' + cpf.substring(3);
+                }
+                if (cpf.length >= 7) {
+                    formattedCpf = formattedCpf.substring(0, 7) + '.' + formattedCpf.substring(7);
+                }
+                // Adiciona traço após o nono dígito
+                if (cpf.length >= 10) {
+                    formattedCpf = formattedCpf.substring(0, 11) + '-' + formattedCpf.substring(11, 13);
+                }
+
+                cpfField.value = formattedCpf;
+            });
+        });
         function showFields() {
             var userType = document.getElementById('user-type').value;
             var clienteFields = document.getElementById('cliente-fields');
