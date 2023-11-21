@@ -140,9 +140,20 @@
                     </button>
                 </div>
             </div>
-            <div class='products-section'>
+            <div class='products-section' id="allProducts" style="display: none;">
                 <div class='products-container'>
                     <div th:each="resultado : ${resultados}" th:data-href="@{/produto/__${resultado['id_produto']}__}" onclick="window.location.href=this.getAttribute('data-href');">
+                        <div class="product-card">
+                            <img th:src="@{${resultado['image']}}" class='product-image'></img>
+                            <p class='product-name' th:text="${resultado['nome']}"></p>
+                            <p class='product-price' th:text=" 'R$ ' + ${resultado['preco']}"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class='products-section' id="BestProducts">
+                <div class='products-container'>
+                    <div th:each="resultado : ${bestSellerList}" th:data-href="@{/produto/__${resultado['id_produto']}__}" onclick="window.location.href=this.getAttribute('data-href');">
                         <div class="product-card">
                             <img th:src="@{${resultado['image']}}" class='product-image'></img>
                             <p class='product-name' th:text="${resultado['nome']}"></p>
