@@ -68,6 +68,7 @@
         // }
         var currentCartItems = [];
 
+        
 function atualizarCarrinho() {
     fetch('/carrinho')
         .then(function (response) {
@@ -150,6 +151,38 @@ function atualizarCarrinho() {
         });
 }
 
+document.addEventListener('carrinhoAtualizado', function(event) {
+    atualizarQuantidadeNoCarrinho(event.detail.productId, 1);
+});
+
+function atualizarQuantidadeNoCarrinho(productId, quantidade) {
+    var totalQuantityElement = document.getElementById('totalQuantity');
+
+    var currentQuantity = parseInt(localStorage.getItem('totalQuantity') || 0, 10);
+
+    if(quantidade === 0) {
+
+        localStorage.setItem('totalQuantity', 0);
+        totalQuantityElement.textContent = 0;
+        return;
+    }
+    var newQuantity = Math.max(0, currentQuantity + quantidade);
+
+
+    localStorage.setItem('totalQuantity', newQuantity);
+
+    totalQuantityElement.textContent = newQuantity;
+}
+
+// Quando a página carrega, recupera a quantidade do localStorage e atualiza o elemento na página
+document.addEventListener('DOMContentLoaded', function() {
+    var totalQuantityElement = document.getElementById('totalQuantity');
+    var currentQuantity = parseInt(localStorage.getItem('totalQuantity') || 0, 10);
+    totalQuantityElement.textContent = currentQuantity;
+});
+
+
+
         var notyf = new Notyf({
             position: {
                 x: 'center',
@@ -174,6 +207,7 @@ function atualizarCarrinho() {
                     itemElement.remove(); // This will remove the item from the DOM
                 }
                 atualizarCarrinho(); // Update the cart
+                atualizarQuantidadeNoCarrinho(productId, -1); 
             }).catch(error => {
                 console.error('Error:', error);
             });
@@ -200,7 +234,7 @@ function atualizarCarrinho() {
                 }
         
                 console.log(itemsArray);
-        
+                
                 // Criar objeto pedidoData com todas as informações necessárias
                 var pedidoData = {
                     "id_cliente": id_cliente,
@@ -225,6 +259,7 @@ function atualizarCarrinho() {
                         itemsArray = [];
                         showGifInCart();
                         document.getElementById("shipping").value = "";
+                        atualizarQuantidadeNoCarrinho(null, 0 * currentCartItems.length);
                         console.log('Success:', data);
                     }
                 })
@@ -236,7 +271,9 @@ function atualizarCarrinho() {
                 console.error("Please choose a shipping company before proceeding to checkout.");
             }
         }
-        
+        function clearQty(){
+            atualizarQuantidadeNoCarrinho(null, 0);
+        }
         function showGifInCart() {
             var gifContainer = document.getElementById("gif-container");
             var bottom = document.getElementById("cart-bottom");

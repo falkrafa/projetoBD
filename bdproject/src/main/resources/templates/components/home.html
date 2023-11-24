@@ -6,6 +6,7 @@
     <link th:href="@{/styles/css/home.css}" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <script th:src="@{/js/home.js}"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
@@ -16,23 +17,39 @@
             <nav class="navbar">
                 <div class="user-info">
                     <div class="user-name" th:if="${user.isLoggedIn}">
-                        <p class="name" th:if="${not #lists.isEmpty(resultNomeLogin) and #lists.isEmpty(nomeProfile)}">
-                            Olá, <span th:text="${resultNomeLogin[0]['nome']}" id="resultNomeLogin" onclick="openUserOptions()"></span>
+                        <p class="name" th:if="${not #lists.isEmpty(resultNomeLogin) and #lists.isEmpty(nomeProfile)}" onclick="openUserOptions()">
+                            Olá, <span th:text="${resultNomeLogin[0]['nome']}" id="resultNomeLogin" ></span><i class="fa fa-solid fa-chevron-down arrow-down"></i>
                         </p>
-                        <p class="name" th:if="${not #lists.isEmpty(resultNomeLogin) and not #lists.isEmpty(nomeProfile)}">
-                            Olá, <span th:text="${nomeProfile[0]['nome']}" id="resultNomeLogin" onclick="openUserOptions()"></span>
+                        <p class="name" th:if="${not #lists.isEmpty(resultNomeLogin) and not #lists.isEmpty(nomeProfile)}" onclick="openUserOptions()"> 
+                            Olá, <span th:text="${nomeProfile[0]['nome']}" id="resultNomeLogin" ></span><i class="fa fa-solid fa-chevron-down arrow-down"></i>
                         </p>
                         <div id="userOptions">
                             <a th:href="@{'/profile/' + ${resultNomeLogin[0]['id_cliente']}}">Meus perfil</a>
                             <a th:href="@{'/meusPedidos/' + ${resultNomeLogin[0]['id_cliente']}}">Meus Pedidos</a>
-                            <a th:href="@{/logout}" id="logout">Logout</a>
+                            <a th:href="@{/logout}" id="logout" onclick='clearQty()'>Logout</a>
                         </div>
                     </div>  
                     <a th:unless="${user.isLoggedIn}" th:href="@{/login}" id="login" class='login-button'>Login</a>
                 </div>
-                <div id="cart-symbol" onclick="toggleCartSidebar()"><i class="fa fa-shopping-cart" style="font-size:25px;"></i></div>
+                <div id="cart-symbol" onclick="toggleCartSidebar()"><i class="fa fa-shopping-cart" style="font-size:25px;"></i><span class='cart-item-qty' id="totalQuantity">0</span></div>
             </nav>
         </div>
+        <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+                <!-- Use Thymeleaf's th:each to iterate over your resultados -->
+                <div th:each="resultado : ${resultados}" class="swiper-slide" 
+                     th:style="'background-image: url(' + @{${resultado['image']}} + ');'"  th:data-href="@{/produto/__${resultado['id_produto']}__}" onclick="window.location.href=this.getAttribute('data-href');">
+                    <!-- Add any content you want here -->
+                    <div class="slide-content">
+                        <h1 th:text="${resultado['nome']}"></h1>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
+        </div>
+        
         <div class='products-section'>
             <div class='products-heading'>
                 <h1>Produtos</h1>
@@ -115,8 +132,8 @@
             <nav class="navbar">
                 <div class="user-info">
                     <div class="user-name" th:if="${user.isFuncLogged}">
-                        <p class="name">
-                            Olá, <span th:text="${resultFunc[0]['nome']}" id="resultNomeLogin" onclick="openUserOptions()"></span>
+                        <p class="name" onclick="openUserOptions()">
+                            Olá, <span th:text="${resultFunc[0]['nome']}" id="resultNomeLogin"></span><i class="fa fa-solid fa-chevron-down arrow-down"></i>
                         </p>
                         <div id="userOptions">
                             <a th:href = "@{/Relatorios}" th:if = "${resultFunc[0]['cargo'] == 'Gerente'}">Relatórios</a>
@@ -165,6 +182,25 @@
         </div>
     </section>
 
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        var swiper = new Swiper(".mySwiper", {
+          spaceBetween: 30,
+          effect: "fade",
+          autoplay: {
+            delay: 2500,
+            disableOnInteraction: false,
+          },
+          navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+          },
+          pagination: {
+            el: ".swiper-pagination",
+            clickable: true,
+          },
 
+        });
+      </script>
 </body>
 </html>

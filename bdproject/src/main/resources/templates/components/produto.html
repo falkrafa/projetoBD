@@ -8,6 +8,7 @@
         <script th:src="@{/js/home.js}"></script>
         <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <div th:if="${!user.isFuncLogged}" th:include="~{components/home :: navbar-container}"></div>
         <div th:if="${user.isFuncLogged}" th:include="~{components/home :: navbar-container-func}"></div>
@@ -133,7 +134,23 @@
                 </div>
             </div>
         </div>
-        
+        <div class='maylike-products-wrapper'>
+            <h2>You may also like</h2>
+            <div class="swiper mySwiper">
+                <div class="swiper-wrapper">
+                  <div th:each="resultado : ${resultados}" th:data-href="@{/produto/__${resultado['id_produto']}__}" onclick="window.location.href=this.getAttribute('data-href');" class="swiper-slide">
+                        <div class="product-card">
+                            <img th:src="@{${resultado['image']}}" class='product-image'></img>
+                            <p class='product-name' th:text="${resultado['nome']}"></p>
+                            <p class='product-price' th:text=" 'R$ ' + ${resultado['preco']}"></p>
+                        </div>
+                  </div>
+                </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-pagination"></div>
+              </div>
+        </div>
         <div id="reviewModal" class="modal">
             <div class="modal-content">
                 <div class="modal-head">
@@ -228,7 +245,7 @@
                 </div>
             </div>
         </div>
-        
+
         
         <div id="responseModal" class="modal">
             <div class="modal-content">
@@ -244,8 +261,33 @@
         </div>
     </section>
 
-
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script type="text/javascript">
+        var swiper = new Swiper(".mySwiper", {
+      effect: "coverflow",
+      grabCursor: true,
+      centeredSlides: true,
+      slidesPerView: "auto",
+      coverflowEffect: {
+        rotate: 50,
+        stretch: 0,
+        depth: 100,
+        modifier: 1,
+        slideShadows: true,
+      },
+      navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+          },
+          pagination: {
+            el: ".swiper-pagination",
+            clickable: true,
+          },
+          style: {
+          "--swiper-pagination-color": "#FFBA08",
+          "--swiper-pagination-bullet-inactive-color": "#999999",
+        }
+    });
         function updateMainImage(newSrc) {
             document.getElementById('mainImage').src = newSrc;
         }
@@ -253,24 +295,33 @@
             position: {
                 x: 'center',
                 y: 'top',
+                toast: {
+                    zIndex: 99999999999 // Set your desired z-index value
+                }
             },
         });
+
         document.querySelectorAll('.add-to-cart-button').forEach(function(button) {
-            button.addEventListener('click', function() {
-                var productId = this.getAttribute('data-product-id');
-                            
-                fetch('/carrinho/adicionar/' + productId, { method: 'POST' })
-                    .then(function (response) {
-                        return response.json();
-                    })
-                    .then(function (data) {
-                        var message = data.message;
-                        if(message){
-                            notyf.success(message);
-                        }
-                });
+    button.addEventListener('click', function() {
+        var productId = this.getAttribute('data-product-id');
+        
+        fetch('/carrinho/adicionar/' + productId, { method: 'POST' })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                var message = data.message;
+                if (message) {
+                    notyf.success(message);
+
+                    // Disparar o evento personalizado
+                    var eventoPersonalizado = new CustomEvent('carrinhoAtualizado', { detail: { productId: productId } });
+                    document.dispatchEvent(eventoPersonalizado);
+                }
             });
-        });
+    });
+});
+
         document.querySelectorAll('.add-review-button').forEach(function(button) {
             button.addEventListener('click', function() {
                 var userLogged = this.getAttribute('userLogged');

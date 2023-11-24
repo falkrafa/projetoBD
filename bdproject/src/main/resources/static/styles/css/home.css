@@ -10,25 +10,36 @@
       display: none;
     }
 }
+body{
+  background-color: black;
+}
 ::-webkit-scrollbar {
   width: 0px;
 }
 .navbar {
-  background-color: rgba(255, 255, 255, 0.8);
+  position: fixed;
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 50px;
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
     width: 100%;
-    color: black;
+    color: black
 }
 .section{
   width: 100vw;
   height: 100vh;
-  /* background-color: 	#1B1212; */
-  background-color: #28282B;
-
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  overflow-y: auto;
+  scrollbar-width: none;
+  /* z-index: 9999; */
+  &::-webkit-scrollbar{
+    display: none;
+  }
 }
 .user-info {
     display: flex;
@@ -64,7 +75,7 @@
     position: fixed;
     right: 0;
     top: 0;
-    /* z-index: 100; */
+    z-index: 9999;
     transition: all 1s ease-in-out;
 }
 .cart-content{
@@ -92,7 +103,29 @@
     margin-left: 10px;
   }
 #cart-symbol {
-    cursor: pointer;
+  color: white;
+  cursor: pointer;
+  position: relative;
+  transition: transform .4s ease;
+  border: none;
+  background-color: transparent;
+}
+.cart-item-qty{
+  position: absolute;
+  right: -6px;
+  top: -5px;
+  font-size: 12px;
+  color: #eee;
+  background-color: #f02d34;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  text-align: center;
+  font-weight: 600;
+
+}
+#cart-symbol:hover {
+  transform: scale(1.1);
 }
 
 #logout {
@@ -105,7 +138,15 @@
     cursor: pointer;
 }
 .name{
-    font-size: 20px;
+
+  color: white;
+  font-size: 20px;
+}
+.arrow-down{
+  margin-left: 5px;
+
+  font-size: 18px;
+  align-self: center;
 }
 .empty-cart{
     margin:40px;
@@ -211,7 +252,7 @@
   }
   .products-section{
 
-    height: 90%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -308,4 +349,38 @@
   }
   .products-heading .active{
     border-bottom: cornflowerblue 2px solid;
+  }
+  .section .swiper {
+    width: 100vw;
+    height: 100vh;
+    scroll-snap-align: center;
+  }
+
+  .section .swiper-slide {
+    background-position: center;
+    background-size: cover;
+    cursor: pointer;
+  }
+  
+  .section .swiper-slide img {
+    display: block;
+    width: 100%;
+  }
+
+  .swiper-pagination-bullet {
+    background-color:#FFBA08 !important;
+  }
+  .mySwiper [class^="swiper-button-"]{
+    color: yellow;
+  }
+  .section .slide-content{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+  }
+  .section .swiper-slide h1{
+    font-size: 10em;
+    color: rgba(255,255,255,0.8);
   }
